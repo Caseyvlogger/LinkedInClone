@@ -1,9 +1,9 @@
-
+import SignIn from "./pages/SignIn.jsx"
 function App() {
 
   return (
     <div>
-      <p className="font-bold text-blue-500">Hello</p>
+      <SignIn/>
     </div>
   )
 }

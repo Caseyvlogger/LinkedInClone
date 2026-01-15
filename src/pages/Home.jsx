@@ -1,7 +1,10 @@
 import { Button } from "antd";
 import Hero from '../assets/LinkedInHeroImage.svg'
+import { useNavigate } from 'react-router-dom';
 
 function Home() {
+
+    const navigate = useNavigate();
 
     return (
         <div class="flex border flex-col items-center bg-[#f3f2f0]">
@@ -63,7 +66,7 @@ function Home() {
                         </p>
                         <div className="flex flex-row mt-[20px] border justify-center">
                             <p className="mr-[5px]">New to LinkedIn?</p>
-                            <a href="#" className="text-blue-600 hover:underline font-semibold">
+                            <a onClick={() => { navigate("/signup") }} className="text-blue-600 hover:underline font-semibold">
                                 Join Now
                             </a>
                         </div>

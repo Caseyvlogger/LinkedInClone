@@ -1,8 +1,11 @@
-import { Form, Input, Button, Card, Checkbox } from "antd";
+import { Form, Input, Button, Checkbox } from "antd";
+import { useNavigate } from 'react-router-dom';
 
 function SignUp() {
 
     const [form] = Form.useForm();
+   
+    const navigate = useNavigate();
 
     const onFinish = (values) => {
         console.log("Form values:", values);
@@ -154,7 +157,7 @@ function SignUp() {
                 {/* Sign In link */}
                 <div className="flex flex-row justify-self-center">
                     <p className="mr-[5px]">Already on LinkedIn?</p>
-                    <a href="#" className="text-blue-600 hover:underline font-semibold">
+                    <a onClick={()=>navigate('/signin')} className="text-blue-600 hover:underline font-semibold">
                         Sign in
                     </a>
                 </div>

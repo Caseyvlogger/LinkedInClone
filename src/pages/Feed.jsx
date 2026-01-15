@@ -9,11 +9,11 @@ function Feed() {
             {/* w-full for small screens */}
             <div className="flex md:flex-row lg:flex-row justify-self-center flex-col border border-red-700 mx-5
              justify-center bg-[#f4f2ee]">
-                {/* Profile * mt-[10px]/}
+                {/* Profile mt-[10px] */}
                 <div className="w-full min-[600px]:w-[576px] md:w-[225px] lg:w-[225px] border mr-[20px] flex-shrink-0">
                     <p>Profile</p>
                 </div>
-                {/*Feed, Suggestions  className="ml-[5px]"col when tablet */}
+                {/*Feed, Suggestions  className="ml-[5px]"col when tablet*/}
                 <div className="flex flex-col md:flex-col lg:flex-row">
                     {/* Feed */}
                     <div className="w-full min-[600px]:w-[576px] min-[768px]:w-[471px] min-[992px]:w-[387px] min-[1200px]:w-[555px] border mr-[20px] flex-shrink-, marginTop:'10px'0">

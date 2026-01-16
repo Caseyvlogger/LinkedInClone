@@ -14,7 +14,73 @@ function Feed() {
     return (
         <div className="bg-[#f4f2ee]">{/* Change bg */}
             {/* Navbar */}
-            <div className="h-[55px] bg-gray-300 mb-[20px]"></div>
+            <div className=" flex h-[55px] bg-white mb-[20px] items-center justify-center">
+                <div className="flex border w-[97%] flex-row items-center ">
+                    <div className="shrink-0 border">
+                        <img src="src\assets\linkedin-colorful-34.png" alt="LinkedIn Logo" />
+                    </div>
+                    {/* For w-full:280w,34h and for w-[1024px]:hide input, show icon*/}
+                    {/* Input + Navbar row justify-between container */}
+                    <div className="flex flex-row justify-between w-full max-[601px]:h-[37px] items-center">
+                        <Input
+                            placeholder="Start a post"
+                            style={{
+                                height: "34px",
+                                width: "280px",
+                                borderRadius: '30px',
+                                color: 'gray',
+                            }}
+                            className="max-[601px]:!hidden"
+                        />
+                        {/* nav buttons Row*/}
+                        <div className="flex flex-row ">
+                            {/* Nav button responsive */}
+                            <div className="flex flex-col items-center border w-[75px] max-[748px]:w-fit max-[747px]:w-[50px]">
+                                <div>
+                                    <img src="src\assets\home-filled-24.png" alt="Home" />
+                                </div>
+                                <p className="text-xs max-[853px]:hidden">Home</p>
+                            </div>
+                            <div className="flex flex-col items-center border w-[75px] max-[748px]:w-fit max-[747px]:w-[50px]">
+                                <div>
+                                    <img src="src\assets\people-24.png" alt="Home" />
+                                </div>
+                                <p className="text-xs max-[853px]:hidden">My Network</p>
+                            </div>
+                            <div className="flex flex-col items-center border w-[75px] max-[748px]:w-fit max-[747px]:w-[50px]">
+                                <div>
+                                    <img src="src\assets\briefcase-24.png" alt="Home" />
+                                </div>
+                                <p className="text-xs max-[853px]:hidden">Jobs</p>
+                            </div>
+                            <div className="flex flex-col items-center border w-[75px] max-[748px]:w-fit max-[747px]:w-[50px]">
+                                <div>
+                                    <img src="src\assets\bubble-24.png" alt="Home" />
+                                </div>
+                                <p className="text-xs max-[853px]:hidden">Messaging</p>
+                            </div>
+                            <div className="flex flex-col items-center border w-[75px] max-[748px]:w-fit max-[747px]:w-[50px]">
+                                <div>
+                                    <img src="src\assets\bell-24.png" alt="Home" />
+                                </div>
+                                <p className="text-xs max-[853px]:hidden">Notifications</p>
+                            </div>
+                            <div className="flex flex-col items-center border w-[75px] max-[748px]:w-fit max-[747px]:w-[50px]">
+                                <div>
+                                    <img src="src\assets\avatar-colorful-24.png" alt="Home" />
+                                </div>
+                                <div className="flex flex-row items-center">
+                                    <p className="text-xs max-[853px]:hidden">Me</p>
+                                    <div className="ml-1">
+                                        <img src="src\assets\arrow-down-10.png" alt="Arrow down" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
             {/* w-full for small screens */}
             <div className="flex md:flex-row lg:flex-row justify-self-center flex-col border border-red-700 mx-5
              justify-center bg-[#f4f2ee]">
@@ -24,7 +90,7 @@ function Feed() {
                     <div className="w-full h-[58px] bg-gray-300 border z-0"></div>
                     {/* Absolute avatar */}
                     <div className="border size-fit absolute top-4 z-10">
-                        <img src="src\assets\avatar-duo-80.png" alt="Avatar" />
+                        <img src="src\assets\avatar-colorful-80.png" alt="Avatar" />
                         <div className="flex bg-[#0a66c2] h-[20px] w-[20px] rounded-[100%] items-center justify-center absolute bottom-2 right-2">
                             <span className="text-white font-semibold">+</span>
                         </div>
@@ -49,7 +115,7 @@ function Feed() {
                         {/* Avatar + Input row */}
                         <div className="flex flex-col justify-between border w-[95%] justify-self-center bg-white">
                             <div className="flex flex-row">
-                                <img src="src\assets\avatar-duo-48.png" alt="Avatar" />
+                                <img src="src\assets\avatar-colorful-48.png" alt="Avatar" />
                                 <Input
                                     placeholder="Start a post"
                                     style={{
@@ -78,7 +144,7 @@ function Feed() {
                             {/* User details Row: image, Name, desig., posted at, world icon */}
                             <div className="flex flex-row mx-2 mt-2">
                                 <div>
-                                    <img src="src\assets\avatar-duo-48.png" alt="Profile Picture" />
+                                    <img src="src\assets\avatar-colorful-48.png" alt="Profile Picture" />
                                 </div>
                                 <div className="ml-2">
                                     <p className="font-semibold">Eric Hu</p>
@@ -119,7 +185,7 @@ function Feed() {
                             </div>
                             {/* Avatar + Comment Input Row */}
                             <div className="flex flex-row mt-3">
-                                <img src="src\assets\avatar-duo-48.png" alt="Avatar" />
+                                <img src="src\assets\avatar-colorful-48.png" alt="Avatar" />
                                 <Input
                                     placeholder="Start a post"
                                     style={{
@@ -133,10 +199,10 @@ function Feed() {
                             {/* Sort by button */}
                             <div>
                                 <Dropdown trigger={'click'} menu={{ items }}>
-                                    <Button  type="text" icon={<img src="src\assets\chevron-down-light.png"></img>} iconPlacement="end">
+                                    <Button type="text" icon={<img src="src\assets\chevron-down-light.png"></img>} iconPlacement="end">
                                         <span className="font-semibold">
                                             Most Relevant
-                                            </span>
+                                        </span>
                                     </Button>
                                 </Dropdown>
                             </div>
@@ -149,7 +215,7 @@ function Feed() {
                         {/* People to follow: Card */}
                         <div className="flex flex-row mt-[10px] ml-[10px]">
                             <div>
-                                <img src="src\assets\avatar-duo-48.png" alt="Avatar" />
+                                <img src="src\assets\avatar-colorful-48.png" alt="Avatar" />
                             </div>
                             <div className="ml-[5px]">
                                 <p className="font-semibold text-sm">Name</p>
@@ -162,7 +228,7 @@ function Feed() {
                         {/* People to follow: Card */}
                         <div className="flex flex-row mt-[10px] ml-[10px]">
                             <div>
-                                <img src="src\assets\avatar-duo-48.png" alt="Avatar" />
+                                <img src="src\assets\avatar-colorful-48.png" alt="Avatar" />
                             </div>
                             <div className="ml-[5px]">
                                 <p className="font-semibold text-sm">Name</p>
@@ -175,7 +241,7 @@ function Feed() {
                         {/* People to follow: Card */}
                         <div className="flex flex-row mt-[10px] ml-[10px]">
                             <div>
-                                <img src="src\assets\avatar-duo-48.png" alt="Avatar" />
+                                <img src="src\assets\avatar-colorful-48.png" alt="Avatar" />
                             </div>
                             <div className="ml-[5px]">
                                 <p className="font-semibold text-sm">Name</p>

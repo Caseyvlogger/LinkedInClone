@@ -1,4 +1,5 @@
 const express = require('express');
+require('dotenv').config();
 const mongoose = require('mongoose');
 const v1Routes = require('./routes/v1/auth.route.cjs');
 
@@ -6,9 +7,9 @@ const app = express();
 
 app.use(express.json());
 
-// Connect to MongoDB 
-mongoose.connect('mongodb://127.0.0.1:27017/LinkedInCloneDB')
-
+// Connect to MongoDB
+const mongoUri = process.env.MONGO_URI;
+mongoose.connect(mongoUri)
   .then(() => console.log('Connected!'))
   .catch(err => console.error('Connection error:', err));
 

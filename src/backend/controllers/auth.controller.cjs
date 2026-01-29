@@ -1,14 +1,17 @@
-const userService = require('../services/user.service.cjs'); // Adjust path if needed
+const httpStatus = require('http-status')
+const { userService, tokenService, authService } = require('../services/index.cjs'); // Adjust path if needed
 
 const register = async (req, res) => {
-    try {
-        console.log('IN controller, calling service.');
-        const user = await userService.createUser(req.body);
-        res.status(201).json({ message: 'User registered successfully', user });
-    } catch (error) {
-        console.error(error);
-        res.status(400).json({ error: error.message });
-    }
+    const user = await userService.createUser(req.body)
+    const tokens = await tokenService.generateAuthTokens(user)
+    res.status(httpStatus.status.CREATED).send({ user, tokens })
 };
 
-module.exports = { register };
+const login = async (req, res) => {
+    const { email, password } = req.body
+    const user = await authService.loginUserWithEmailAndPassword(email, password);
+    const tokens = await tokenService.generateAuthTokens(user)
+    res.status(201).send({ user, tokens });
+};
+
+module.exports = { register, login };

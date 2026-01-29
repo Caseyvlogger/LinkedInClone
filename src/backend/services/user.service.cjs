@@ -6,4 +6,8 @@ const createUser = async (userData) => {
     return user;
 };
 
-module.exports = { createUser };
+const getUserByEmail = async (email) => {
+  return User.findOne({ email });
+};
+
+module.exports = { createUser, getUserByEmail };

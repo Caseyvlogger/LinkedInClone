@@ -7,5 +7,6 @@ const authController = require('../../controllers/auth.controller.cjs');
 const router = express.Router();
 console.log("In auth.route.js, calling auth.controller.js")
 router.post('/register', validate(authValidation.register), authController.register);
+router.post('/login', validate(authValidation.login), authController.login);
 
 module.exports=router;

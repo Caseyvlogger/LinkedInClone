@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken')
 const moment = require('moment')
 const config = require('../config/config.cjs')
 
-const generateToken = (userId, expires, type = "ACCESS", secret = config.jwt.secret) => {
+const generateToken = (userId, expires, type = "access", secret = config.jwt.secret) => {
     const payload = {
         sub: userId,
         iat: moment().unix(),
@@ -13,7 +13,7 @@ const generateToken = (userId, expires, type = "ACCESS", secret = config.jwt.sec
 }
 
 const generateAuthTokens = async (user) => {
-    const accessTokenExpires = moment().add(config.jwt.accessExpMin, 'minutes')
+    const accessTokenExpires = moment().add(config.jwt.accessExpMin, 'minutes') //1440 eq. to 1d
     const accessToken = generateToken(user._id, accessTokenExpires, 'access');
     return {
         access: {

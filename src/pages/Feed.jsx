@@ -1,12 +1,35 @@
 import { Input, Button, Dropdown, message, Modal } from "antd";
 import Navbar from "../components/NavBar";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import axiosInstance from "../api/axiosInstance";
 
 function Feed() {
     const [user, setUser] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [postContent, setPostContent] = useState("");
+
+    const fileInputRef = useRef(null)
+    const [selectedImage, setSelectedImage] = useState(null);
+    const handleImageClick = () => {
+        fileInputRef.current.click();
+    };
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Supervisor's requirement: 5MB limit (5 * 1024 * 1024 bytes)
+        if (file.size > 5242880) {
+            message.error("File is too large! Please select an image under 5MB.");
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setSelectedImage(reader.result); // This is your Base64 string
+        };
+        reader.readAsDataURL(file);
+    };
 
     const showModal = () => setIsModalOpen(true);
     const handleCancel = () => {
@@ -176,13 +199,13 @@ function Feed() {
                                 open={isModalOpen}
                                 onCancel={handleCancel}
                                 footer={[
-                                    <Button key="image" type="text" className="float-left">
-                                        📷 {/* We'll swap this for a real icon later */}
+                                    <Button key="image" type="text" className="float-left" onClick={handleImageClick}>
+                                        📷 {/* Clicking this now triggers the explorer */}
                                     </Button>,
                                     <Button
                                         key="submit"
                                         type="primary"
-                                        disabled={!postContent.trim()}
+                                        disabled={!postContent.trim() && !selectedImage}
                                         onClick={handlePost}
                                         className="rounded-full font-semibold"
                                     >
@@ -190,11 +213,19 @@ function Feed() {
                                     </Button>
                                 ]}
                             >
+                                {/* Hidden File Input */}
+                                <input
+                                    type="file"
+                                    ref={fileInputRef}
+                                    onChange={handleFileChange}
+                                    accept="image/*"
+                                    style={{ display: 'none' }}
+                                />
+
                                 <div className="flex items-center gap-2 mb-4">
-                                    <img src="src/assets/avatar-colorful-80.png" className="w-10 h-10 rounded-full" alt="User" />
+                                    <img src="src/assets/avatar-colorful-48.png" className="w-10 h-10 rounded-full" alt="User" />
                                     <div>
                                         <p className="font-semibold">{user?.name} {user?.lastName}</p>
-                                        <span className="text-xs text-gray-500 border border-gray-500 px-2 py-1 rounded-full">Anyone</span>
                                     </div>
                                 </div>
 
@@ -202,10 +233,26 @@ function Feed() {
                                     placeholder="What do you want to talk about?"
                                     value={postContent}
                                     onChange={(e) => setPostContent(e.target.value)}
-                                    rows={6}
+                                    rows={4}
                                     variant="borderless"
-                                    className="text-lg"
                                 />
+
+                                {/* Image Preview Area */}
+                                {selectedImage && (
+                                    <div className="relative mt-4">
+                                        <img src={selectedImage} alt="Preview" className="w-full max-h-[300px] object-contain rounded-lg" />
+                                        <Button
+                                            type="primary"
+                                            danger
+                                            shape="circle"
+                                            size="small"
+                                            className="absolute top-2 right-2"
+                                            onClick={() => setSelectedImage(null)}
+                                        >
+                                            X
+                                        </Button>
+                                    </div>
+                                )}
                             </Modal>
                             {/* Sort by button */}
                             <div>

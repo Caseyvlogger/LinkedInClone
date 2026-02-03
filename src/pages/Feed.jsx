@@ -1,10 +1,24 @@
-import { Input, Button, Dropdown, message } from "antd";
+import { Input, Button, Dropdown, message, Modal } from "antd";
 import Navbar from "../components/NavBar";
 import { useState, useEffect } from "react";
 import axiosInstance from "../api/axiosInstance";
 
 function Feed() {
     const [user, setUser] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [postContent, setPostContent] = useState("");
+
+    const showModal = () => setIsModalOpen(true);
+    const handleCancel = () => {
+        setIsModalOpen(false);
+        setPostContent(""); // Clear text on close
+    };
+
+    const handlePost = () => {
+        console.log("Posting:", postContent);
+        // Logic for API call goes here later
+        setIsModalOpen(false);
+    };
 
     const items = [
         {
@@ -69,15 +83,22 @@ function Feed() {
                         <div className="flex flex-col justify-between border w-[95%] justify-self-center bg-white">
                             <div className="flex flex-row">
                                 <img src="src\assets\avatar-colorful-48.png" alt="Avatar" />
-                                <Input
-                                    placeholder="Start a post"
+                                <Button
+                                    onClick={showModal}
                                     style={{
                                         height: "48px",
-                                        width: "467px",
+                                        width: "467px", //Change this for mobile; Consider width:100% or max-width.
                                         borderRadius: '30px',
                                         color: 'gray',
+                                        display: 'flex',
+                                        justifyContent: 'flex-start',
+                                        alignItems: 'center',
+                                        textAlign: 'left',
+                                        paddingLeft: '20px'
                                     }}
-                                />
+                                >
+                                    <span className="font-semibold">Start a post</span>
+                                </Button>
                             </div>
                             {/* Video, Photo, Write article buttons */}
                             <div className="flex flex-row border justify-between mt-3">
@@ -149,6 +170,43 @@ function Feed() {
                                     }}
                                 />
                             </div>
+                            {/* The Ant Design Modal */}
+                            <Modal
+                                title="Create a post"
+                                open={isModalOpen}
+                                onCancel={handleCancel}
+                                footer={[
+                                    <Button key="image" type="text" className="float-left">
+                                        📷 {/* We'll swap this for a real icon later */}
+                                    </Button>,
+                                    <Button
+                                        key="submit"
+                                        type="primary"
+                                        disabled={!postContent.trim()}
+                                        onClick={handlePost}
+                                        className="rounded-full font-semibold"
+                                    >
+                                        Post
+                                    </Button>
+                                ]}
+                            >
+                                <div className="flex items-center gap-2 mb-4">
+                                    <img src="src/assets/avatar-colorful-80.png" className="w-10 h-10 rounded-full" alt="User" />
+                                    <div>
+                                        <p className="font-semibold">{user?.name} {user?.lastName}</p>
+                                        <span className="text-xs text-gray-500 border border-gray-500 px-2 py-1 rounded-full">Anyone</span>
+                                    </div>
+                                </div>
+
+                                <Input.TextArea
+                                    placeholder="What do you want to talk about?"
+                                    value={postContent}
+                                    onChange={(e) => setPostContent(e.target.value)}
+                                    rows={6}
+                                    variant="borderless"
+                                    className="text-lg"
+                                />
+                            </Modal>
                             {/* Sort by button */}
                             <div>
                                 <Dropdown trigger={'click'} menu={{ items }}>

@@ -37,10 +37,37 @@ function Feed() {
         setPostContent(""); // Clear text on close
     };
 
-    const handlePost = () => {
-        console.log("Posting:", postContent);
-        // Logic for API call goes here later
-        setIsModalOpen(false);
+    const handlePost = async () => {
+        // Show a loading state to the user
+        const hideLoading = message.loading('Creating post...', 0);
+
+        try {
+            const postData = {
+                content: postContent,
+                image: selectedImage, // The Base64 string you got from FileReader
+            };
+
+            // Your auth.route.cjs should have: router.post('/posts', auth, postController.createPost)
+            const response = await axiosInstance.post('/posts', postData);
+
+            if (response.status === 201) {
+                hideLoading();
+                message.success("Post created successfully!");
+
+                // Reset the Modal and State
+                setIsModalOpen(false);
+                setPostContent("");
+                setSelectedImage(null);
+
+                // Optional: Refresh feed logic can go here
+            }
+        } catch (error) {
+            hideLoading();
+            console.error("Post creation error:", error);
+
+            const errorMsg = error.response?.data?.message || "Failed to create post. Check image size.";
+            message.error(errorMsg);
+        }
     };
 
     const items = [

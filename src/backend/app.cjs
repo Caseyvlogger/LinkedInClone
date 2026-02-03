@@ -26,6 +26,20 @@ mongoose.connect(mongoUri, { serverSelectionTimeoutMS: 1000 })
 
 app.use('/v1', v1Routes);
 
+app.use((err, req, res, next) => {
+  const statusCode = err.statusCode || 500;
+  const message = err.message || 'Internal Server Error';
+
+  if (statusCode === 500) {
+    console.error(err);
+  }
+
+  res.status(statusCode).json({
+    code: statusCode,
+    message: message,
+  });
+});
+
 app.listen(3000, () => {
   console.log(`LinkedInClone server listening on http://localhost:3000`);
 });

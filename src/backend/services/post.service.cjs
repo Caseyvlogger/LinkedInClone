@@ -1,21 +1,12 @@
-const httpStatus = require('http-status');
-const { postService } = require('../services/index.cjs');
+const Post = require('../models/post.model.cjs');
 
-const createPost = async (req, res, next) => {
-    try {
-        const postData = {
-            ...req.body,
-            author: req.user._id, // Using the user object attached by your auth middleware
-        };
-
-        const post = await postService.createPost(postData);
-
-        // 201 Created
-        res.status(httpStatus.CREATED).send(post);
-    } catch (error) {
-        // This sends the error to your global error handler (app.js)
-        next(error);
-    }
+/**
+ * Create a post
+ * @param {Object} postBody
+ * @returns {Promise<Post>}
+ */
+const createPost = async (postBody) => {
+    return Post.create(postBody);
 };
 
 module.exports = {

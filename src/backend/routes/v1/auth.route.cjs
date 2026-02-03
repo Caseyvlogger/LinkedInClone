@@ -11,5 +11,8 @@ router.post('/register', validate(authValidation.register), authController.regis
 router.post('/login', validate(authValidation.login), authController.login);
 router.get('/feed', auth, postController.getFeed);
 router.post('/logout', authController.logout);
+router.get('/me', auth, (req, res) => {
+    res.send(req.user)
+});
 
 module.exports = router;

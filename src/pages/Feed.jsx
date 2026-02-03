@@ -1,7 +1,11 @@
-import { Input, Button, Dropdown } from "antd";
+import { Input, Button, Dropdown, message } from "antd";
 import Navbar from "../components/NavBar";
+import { useState, useEffect } from "react";
+import axiosInstance from "../api/axiosInstance";
 
 function Feed() {
+    const [user, setUser] = useState(null);
+
     const items = [
         {
             label: 'Most relevant',
@@ -12,6 +16,20 @@ function Feed() {
             key: '2',
         },
     ];
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                // We call the new /me endpoint
+                const response = await axiosInstance.get('/me');
+                setUser(response.data);
+            } catch (error) {
+                message.error("Failed to load user profile", error);
+            }
+        };
+        fetchUserData();
+    }, []);
+
     return (
         <div className="bg-[#f4f2ee]">{/* Change bg */}
 
@@ -30,11 +48,11 @@ function Feed() {
                             <span className="text-white font-semibold">+</span>
                         </div>
                     </div>
-                    {/* Details */}
-                    <div className="mt-10 ml-3">
-                        <p className="font-semibold">Name</p>
-                        <p className="text-xs">Completed education at Comsats University Cantt</p>
-                        <p className="text-xs text-gray-500">Rawalpindi, Punjab</p>
+                    {/* Dynamic Name and Details */}
+                    <div className="mt-10 ml-3 pb-4">
+                        <p className="font-semibold text-lg">
+                            {user ? `${user.name} ${user.lastName}` : "Loading..."}
+                        </p>
                     </div>
                     {/* Experience button */}
                     <div className="justify-self-center w-[90%] mt-3 mb-3">

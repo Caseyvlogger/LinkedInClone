@@ -10,9 +10,9 @@ const { jwtStrategy } = require('./config/passport.cjs');
 const app = express();
 
 app.use(cors({
-  origin: 'http://localhost:5173', // Your React dev server URL
+  origin: /^http:\/\/localhost:\d+$/,
   methods: 'GET,POST,PUT,DELETE',
-  credentials: true // Crucial for sending cookies/headers
+  credentials: true
 }));
 
 app.use(express.json({ limit: '5mb' }));

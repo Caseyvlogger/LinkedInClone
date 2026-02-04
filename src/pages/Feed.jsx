@@ -232,7 +232,8 @@ function Feed() {
                                     <Button
                                         key="submit"
                                         type="primary"
-                                        disabled={!postContent.trim() && !selectedImage}
+                                        // Only checks for text content now
+                                        disabled={!postContent.trim()}
                                         onClick={handlePost}
                                         className="rounded-full font-semibold"
                                     >

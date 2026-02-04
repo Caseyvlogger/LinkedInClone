@@ -9,7 +9,7 @@ const createPost = async (req, res, next) => {
         };
 
         const post = await postService.createPost(postData);
-        res.status(httpStatus.CREATED).send(post);
+        res.status(httpStatus.status.CREATED).send(post);
     } catch (error) {
         next(error);
     }

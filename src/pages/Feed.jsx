@@ -7,7 +7,7 @@ function Feed() {
     const [user, setUser] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [postContent, setPostContent] = useState("");
-
+    const [posts, setPosts] = useState([])
     const fileInputRef = useRef(null);
     const [selectedImage, setSelectedImage] = useState(null);
 
@@ -73,7 +73,7 @@ function Feed() {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const response = await axiosInstance.get('/me');
+                const response = await axiosInstance.get('auth/me');
                 setUser(response.data);
             } catch (error) {
                 message.error("Failed to load user profile");
@@ -81,6 +81,21 @@ function Feed() {
         };
         fetchUserData();
     }, []);
+
+    useEffect(() => {
+        const fetchPosts = async () => {
+            try {
+                const response = await axiosInstance.get('/posts')
+                setPosts(response.data)
+                console.log(response.data)
+            }
+            catch (error) {
+                console.error("Error:", error)
+                message.error("Failed to load feed data.")
+            }
+        }
+        fetchPosts();
+    }, [])
 
     return (
         <div className="bg-[#f4f2ee] min-h-screen">
@@ -135,30 +150,31 @@ function Feed() {
                         </div>
 
                         {/* Example Post */}
-                        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                            <div className="flex p-4 gap-2">
-                                <img src="src/assets/avatar-colorful-48.png" className="w-12 h-12 rounded-full" alt="Profile" />
-                                <div>
-                                    <p className="font-semibold text-sm">Eric Hu</p>
-                                    <p className="text-xs text-gray-500">Software Developer | Technical Writer</p>
-                                    <div className="flex items-center gap-1 text-xs text-gray-400">
-                                        <span>1w • </span>
-                                        <img src="src/assets/earth-black-24.png" className="w-3 h-3" alt="Public" />
+                        {posts.map((post) => (
+                            <div key={post._id} className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                                <div className="flex p-4 gap-2">
+                                    <img src="src/assets/avatar-colorful-48.png" className="w-12 h-12 rounded-full" alt="Profile" />
+                                    <div>
+                                        <p className="font-semibold text-sm">{post.author?.name}</p>
+                                        <p className="text-xs text-gray-500">Software Developer | Technical Writer</p>
+                                        <div className="flex items-center gap-1 text-xs text-gray-400">
+                                            <span>1w • </span>
+                                            <img src="src/assets/earth-black-24.png" className="w-3 h-3" alt="Public" />
+                                        </div>
                                     </div>
                                 </div>
+                                <div className="px-4 pb-2 text-sm">
+                                    <p>{post.content}</p>
+                                </div>
+                                {post.image && <img src={post.image} className="w-full" alt="Post" />}
+                                <div className="flex justify-around border-t border-gray-100 py-1 mt-2">
+                                    <Button type="text" className="font-semibold text-gray-500">Like</Button>
+                                    <Button type="text" className="font-semibold text-gray-500">Comment</Button>
+                                    <Button type="text" className="font-semibold text-gray-500">Repost</Button>
+                                    <Button type="text" className="font-semibold text-gray-500">Send</Button>
+                                </div>
                             </div>
-                            <div className="px-4 pb-2 text-sm">
-                                <p>Recruiters spend 7 seconds reading your resume. Here are 7 steps to guarantee you grab their attention...</p>
-                            </div>
-                            <img src="src/assets/post-image.jpg" className="w-full" alt="Post" />
-
-                            <div className="flex justify-around border-t border-gray-100 py-1 mt-2">
-                                <Button type="text" className="font-semibold text-gray-500">Like</Button>
-                                <Button type="text" className="font-semibold text-gray-500">Comment</Button>
-                                <Button type="text" className="font-semibold text-gray-500">Repost</Button>
-                                <Button type="text" className="font-semibold text-gray-500">Send</Button>
-                            </div>
-                        </div>
+                        ))}
 
                         {/* Sort Dropdown */}
                         <div className="flex items-center gap-1">

@@ -15,8 +15,9 @@ const createPost = async (req, res, next) => {
     }
 };
 
-const getFeed = async (req, res) => {
-    res.send("Got Feed.");
+const getPosts = async (req, res) => {
+    const posts = await postService.queryPosts();
+    res.send(posts);
 };
 
-module.exports = { getFeed, createPost };
+module.exports = { getPosts, createPost };

@@ -18,6 +18,14 @@ const postSchema = mongoose.Schema(
         },
         likes: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'User' }],
         comments: [{ type: mongoose.SchemaTypes.ObjectId }],
+        fileType: {
+            type: String,
+            default: null
+        },
+        fileSize: {
+            type: Number,
+            default: null
+        }
     },
     { timestamps: true }
 );

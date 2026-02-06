@@ -60,7 +60,7 @@ function Profile() {
 
                 </div>
             </div>
-            {/* Profile details + Settings/People Row */}
+            {/* Profile avatar, banner + Settings/People Row */}
             <div className="flex flex-col md:flex-row border border-orange-500 w-[85%] justify-self-center">
                 {/* Profile div: w-[804px]; h-201 <1200px; w-636 h-159; <922px: 396, 99; <768px: 576, 144 */}
                 <div className="min-[768px]:w-[396px] min-[922px]:w-[636px] min-[1200px]:w-[804px] border md:mr-5 relative">
@@ -73,17 +73,18 @@ function Profile() {
                                     xl:h-[159px] 
                                     min-[1400px]:h-[201px]
                                     ">
-                        {/* Profile Placeholder + '+' button */}
-                        <div>
+                        {/* Profile Avatar + '+' button */}
+                        <div className="border border-solid">
                             <img className="absolute border top-17" src="src/assets/profile-placeholder-128.png" alt="Profile placeholder" />
-                            <div className="bg-white border border-[#0a66c2] h-[40px] w-[40px] rounded-full">
-                                <span className="text-[#0a66c2] text-[30px] absolute">+</span>
+                            <div className="flex justify-center items-center bg-white border border-[#0a66c2]
+                             h-[30px] w-[30px] rounded-full absolute top-40 left-20">
+                                <span className="text-[#0a66c2] text-[30px] ">+</span>
                             </div>
                         </div>
                     </div>
                 </div>
                 {/* Profile language + Settings/People col */}
-                <div className="flex flex-col md:w-[300px] border">
+                <div className="flex flex-col md:w-[300px] mt-20 md:mt-0 border border-pink-600">
                     <div className="flex flex-row justify-between">
                         <div className="border">
                             <p className="text-lg font-semibold">Profile Language</p>

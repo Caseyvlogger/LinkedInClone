@@ -1,15 +1,40 @@
-import { Form, Input, Button, Checkbox } from "antd";
+import { Form, Input, Button, Checkbox, message } from "antd";
 import { useNavigate } from 'react-router-dom';
+import axiosInstance from '../api/axiosInstance.js'
 
 function SignUp() {
 
     const [form] = Form.useForm();
-   
+
     const navigate = useNavigate();
 
-    const onFinish = (values) => {
-        console.log("Form values:", values);
+    const onFinish = async (values) => {
+        const hideLoading = message.loading('Creating your account...', 0);
+
+        try {
+            const response = await axiosInstance.post('/register', values);
+
+            const accessToken = response.data?.tokens?.access?.token;
+            const refreshToken = response.data?.tokens?.refresh?.token;
+
+            if (accessToken) {
+                localStorage.setItem('accessToken', accessToken);
+                localStorage.setItem('refreshToken', refreshToken);
+
+                hideLoading();
+                message.success("Account created successfully!");
+
+                navigate('/feed');
+            } else {
+                throw new Error("Registration failed: No token received.");
+            }
+        } catch (error) {
+            hideLoading();
+            const errorMsg = error.response?.data?.message || error.message || "Failed to register.";
+            message.error(errorMsg);
+        }
     };
+
 
     const onFinishFailed = ({ errorFields }) => {
         if (errorFields.length > 0) {
@@ -35,6 +60,23 @@ function SignUp() {
                     onFinishFailed={onFinishFailed}
                     autoComplete="on"
                 >
+                    {/* First Name */}
+                    <Form.Item
+                        label="First Name"
+                        name="name"
+                        rules={[{ required: true, message: "Please enter your first name" }]}
+                    >
+                        <Input placeholder="First Name" />
+                    </Form.Item>
+
+                    {/* Last Name */}
+                    <Form.Item
+                        label="Last Name"
+                        name="lastName"
+                        rules={[{ required: true, message: "Please enter your last name" }]}
+                    >
+                        <Input placeholder="Last Name" />
+                    </Form.Item>
                     {/* Email */}
                     <Form.Item
                         label="Email"
@@ -157,7 +199,7 @@ function SignUp() {
                 {/* Sign In link */}
                 <div className="flex flex-row justify-self-center">
                     <p className="mr-[5px]">Already on LinkedIn?</p>
-                    <a onClick={()=>navigate('/signin')} className="text-blue-600 hover:underline font-semibold">
+                    <a onClick={() => navigate('/signin')} className="text-blue-600 hover:underline font-semibold">
                         Sign in
                     </a>
                 </div>

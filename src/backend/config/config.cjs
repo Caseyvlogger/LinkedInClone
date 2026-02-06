@@ -10,6 +10,7 @@ module.exports = {
     },
     jwt: {
         secret: process.env.JWT_SECRET,
-        accessExpMin: process.env.JWT_ACCESS_EXP_MIN || 1440
+        accessExpMin: process.env.JWT_ACCESS_EXP_MIN,
+        refreshExpMin: process.env.JWT_REFRESH_EXPIRATION_MINUTES,
     }
 }

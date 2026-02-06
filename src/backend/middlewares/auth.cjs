@@ -6,7 +6,7 @@ const auth = async (req, res, next) => {
         //Using passport.authenticate to find token in header, decode jwt, find user in db, handle errors.
         passport.authenticate('jwt', { session: false }, (err, user, info) => {
             if (err || info || !user) {
-                return reject(res.status(httpStatus.status.UNAUTHORIZED).send({ message: "Please authenticate" }))
+                return reject(new Error('Please authenticate'));
             }
             //For success, attach user to req obj so can use in controller next to where this middleware is called.
             req.user = user

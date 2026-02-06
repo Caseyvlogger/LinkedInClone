@@ -8,8 +8,6 @@ function Home() {
 
     return (
         <div class="flex border flex-col items-center bg-[#f3f2f0]">
-            {/* Navbar */}
-
             {/* ((Welcome + Auth) Column + Hero) Row*/}
             {/* Small screens: Column; Medium + large: Row of (Welcome + Auth) Column + Hero */}
             <div className="flex flex-col md:flex-row border border-pink-700">

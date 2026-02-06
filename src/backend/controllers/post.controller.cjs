@@ -4,10 +4,14 @@ const { postService } = require('../services/index.cjs');
 const createPost = async (req, res, next) => {
     try {
         const postData = {
-            ...req.body,
+            content: req.body.content,
             author: req.user.id,
         };
-
+        if (req.file) {
+            postData.file = req.file.buffer
+            postData.contentType = req.file.mimetype
+            postData.fileSize = req.file.size
+        }
         const post = await postService.createPost(postData);
         res.status(httpStatus.status.CREATED).send(post);
     } catch (error) {

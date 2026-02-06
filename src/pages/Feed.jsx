@@ -43,19 +43,24 @@ function Feed() {
         const hideLoading = message.loading('Creating post...', 0);
 
         try {
-            const postData = {
-                content: postContent,
-                image: selectedImage,
-            };
+            const formData = new FormData();
+            formData.append('content', postContent)
 
-            const response = await axiosInstance.post('/posts', postData);
+            const file = fileInputRef.current.files[0]; //Select first from multiple.
+            if (file) {
+                formData.append('file', file)
+            }
+            const response = await axiosInstance.post('/posts', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            })
 
             if (response.status === 201) {
-                hideLoading();
-                message.success("Post created successfully!");
-                setIsModalOpen(false);
-                setPostContent("");
-                setSelectedImage(null);
+                hideLoading()
+                message.success("Post created successfully.")
+                setIsModalOpen(false)
+                setPostContent("")
+                setSelectedImage(null)
+                //Refresh posts here.
             }
         } catch (error) {
             hideLoading();
@@ -64,6 +69,18 @@ function Feed() {
             message.error(errorMsg);
         }
     };
+
+    const renderPostImage = (post) => {
+        //check for file
+        if (!post.file || !post.file.data) return null
+        //convert buffer to base64 so can display in img
+        const base64String = btoa(
+            new Uint8Array(post.file.data)
+                .reduce((data, byte) => data + String.fromCharCode(byte), '')
+        )
+        const imgSrc = `data:${post.contentType || 'image/png'};base64,${base64String}`
+        return <img src={imgSrc} className="w-full" alt="Post" />
+    }
 
     const items = [
         { label: 'Most relevant', key: '1' },
@@ -166,7 +183,7 @@ function Feed() {
                                 <div className="px-4 pb-2 text-sm">
                                     <p>{post.content}</p>
                                 </div>
-                                {post.image && <img src={post.image} className="w-full" alt="Post" />}
+                                {renderPostImage(post)}
                                 <div className="flex justify-around border-t border-gray-100 py-1 mt-2">
                                     <Button type="text" className="font-semibold text-gray-500">Like</Button>
                                     <Button type="text" className="font-semibold text-gray-500">Comment</Button>

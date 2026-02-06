@@ -52,13 +52,13 @@ function Navbar() {
                     <img src="src/assets/linkedin-colorful-34.png" alt="Logo" />
                 </div>
 
-                <div className="flex flex-row justify-between w-full items-center ml-2">
+                <div className="flex flex-row justify-between w-full items-center ml-2 border border-solid">
                     <Input
                         placeholder="Search"
                         className="max-[601px]:!hidden bg-[#eef3f8] border-none h-[34px] w-[280px] rounded-[4px]"
                     />
 
-                    <div className="flex flex-row">
+                    <div className="flex flex-row items-center">
                         <NavItem icon="src/assets/home-filled-24.png" label="Home" onClick={() => navigate('/feed')} />
                         <NavItem icon="src/assets/people-24.png" label="My Network" />
                         <NavItem icon="src/assets/briefcase-24.png" label="Jobs" />
@@ -82,7 +82,7 @@ function Navbar() {
 }
 
 const NavItem = ({ icon, label, onClick }) => (
-    <div className="flex flex-col items-center cursor-pointer w-[75px] max-[747px]:w-[50px]" onClick={onClick}>
+    <div className="flex flex-col items-center cursor-pointer w-[75px] max-[747px]:w-[43px]" onClick={onClick}>
         <img src={icon} alt={label} />
         <p className="text-xs max-[853px]:hidden">{label}</p>
     </div>

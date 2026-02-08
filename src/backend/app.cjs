@@ -29,6 +29,7 @@ mongoose.connect(mongoUri, { serverSelectionTimeoutMS: 1000 })
 app.use('/v1', v1Routes);
 
 app.use((err, req, res, next) => {
+  console.log("err:", err)//this line not printing.
   const statusCode = err.statusCode || 500;
   const message = err.message || 'Internal Server Error';
 

@@ -19,4 +19,22 @@ axiosInstance.interceptors.request.use(
     (error) => Promise.reject(error)
 );
 
+axiosInstance.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        console.log("INTERCEPTOR HIT!"); // If you don't see this, you're using global axios in your component
+        console.log("Status Code:", error.response?.status);
+
+        if (error.response?.status === 401) {
+            console.log("401 detected. Path is:", window.location.pathname);
+            if (window.location.pathname !== '/signin') {
+                console.log("Redirecting now...");
+                localStorage.clear();
+                window.location.href = '/signin';
+            }
+        }
+        return Promise.reject(error);
+    }
+);
+
 export default axiosInstance;

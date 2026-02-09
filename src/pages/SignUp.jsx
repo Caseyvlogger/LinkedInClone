@@ -1,6 +1,6 @@
 import { Form, Input, Button, Checkbox, message } from "antd";
 import { useNavigate } from 'react-router-dom';
-import axiosInstance from '../api/axiosInstance.js'
+import { registerUser } from "../services/authService.js";
 
 function SignUp() {
 
@@ -12,7 +12,7 @@ function SignUp() {
         const hideLoading = message.loading('Creating your account...', 0);
 
         try {
-            const response = await axiosInstance.post('/register', values);
+            const response = await registerUser(values)
 
             const accessToken = response.data?.tokens?.access?.token;
             const refreshToken = response.data?.tokens?.refresh?.token;

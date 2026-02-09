@@ -117,11 +117,12 @@ function Feed() {
     return (
         <div className="bg-[#f4f2ee] min-h-screen">
             <Navbar />
-
-            <div className="flex flex-col md:flex-row justify-center gap-6 px-4 mt-6 max-w-6xl mx-auto">
+            {/* Div with three columns */}
+            <div className="flex flex-col md:flex-row justify-center 
+            items-center md:items-start gap-6 px-4 mt-6 max-w-6xl mx-auto">
 
                 {/* Profile Sidebar */}
-                <div className="w-full md:w-[225px] flex-shrink-0 bg-white h-fit rounded-lg overflow-hidden border border-gray-200">
+                <div className="w-full md:w-[225px] max-w-[555px] flex-shrink-0 bg-white h-fit rounded-lg overflow-hidden border border-gray-200">
                     <div className="w-full h-[58px] bg-gray-300"></div>
                     <div className="relative flex justify-center -mt-8">
                         <div className="relative">
@@ -142,7 +143,7 @@ function Feed() {
                     </div>
                 </div>
 
-                {/* Main Feed Content */}
+                {/* Main Feed Content + Right people column*/}
                 <div className="flex flex-col lg:flex-row gap-6 flex-grow">
 
                     {/* Feed Posts */}
@@ -205,7 +206,7 @@ function Feed() {
                     </div>
 
                     {/* Right Suggestions Sidebar */}
-                    <div className="w-full lg:w-[300px] bg-white rounded-lg border border-gray-200 p-4 h-fit">
+                    <div className="w-full lg:w-[300px] max-w-[555px] bg-white rounded-lg border border-gray-200 p-4 h-fit">
                         <p className="font-semibold mb-4">Add to your Feed</p>
 
                         {[1, 2, 3].map((item) => (

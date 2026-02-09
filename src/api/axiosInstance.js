@@ -22,7 +22,7 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
     (response) => response,
     (error) => {
-        console.log("INTERCEPTOR HIT!"); // If you don't see this, you're using global axios in your component
+        console.log("INTERCEPTOR HIT!");
         console.log("Status Code:", error.response?.status);
 
         if (error.response?.status === 401) {

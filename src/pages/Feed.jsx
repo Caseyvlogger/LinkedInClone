@@ -1,6 +1,6 @@
 import { Input, Button, Dropdown, message, Modal } from "antd";
 import Navbar from "../components/NavBar";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import axiosInstance from "../api/axiosInstance";
 
 function Feed() {
@@ -39,7 +39,7 @@ function Feed() {
         setSelectedImage(null);
     };
 
-    const handlePost = async () => {
+    const handlePost = useCallback(async () => {
         const hideLoading = message.loading('Creating post...', 0);
 
         try {
@@ -68,7 +68,7 @@ function Feed() {
             const errorMsg = error.response?.data?.message || "Failed to create post.";
             message.error(errorMsg);
         }
-    };
+    }, [postContent, setIsModalOpen, setPostContent, setSelectedImage])
 
     const renderPostImage = (post) => {
         //check for file

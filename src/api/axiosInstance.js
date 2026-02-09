@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { message } from 'antd';
 
 const axiosInstance = axios.create({
     baseURL: import.meta.env.REACT_APP_API_URL || 'http://localhost:3000/v1',
@@ -22,16 +23,21 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
     (response) => response,
     (error) => {
-        console.log("INTERCEPTOR HIT!"); // If you don't see this, you're using global axios in your component
+        console.log("INTERCEPTOR HIT!");
         console.log("Status Code:", error.response?.status);
-
-        if (error.response?.status === 401) {
-            console.log("401 detected. Path is:", window.location.pathname);
-            if (window.location.pathname !== '/signin') {
-                console.log("Redirecting now...");
-                localStorage.clear();
-                window.location.href = '/signin';
+        //server sent response but some error happened.
+        if (error.response) {
+            if (error.response?.status === 401) {
+                if (window.location.pathname !== '/signin') {
+                    localStorage.clear();
+                    window.location.href = '/signin';
+                }
             }
+        }
+        //server off or no internet.
+        if (error.request) {
+            console.error("Server unreachable.")
+            message.error("Server down.")
         }
         return Promise.reject(error);
     }

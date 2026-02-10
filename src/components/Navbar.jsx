@@ -8,7 +8,7 @@ function Navbar() {
     const handleLogout = async () => {
         try {
             const refreshToken = localStorage.getItem('refreshToken');
-            await axiosInstance.post('/logout', { refreshToken });
+            await axiosInstance.post('/auth/logout', { refreshToken });
         } catch (error) {
             console.warn("Server-side logout failed, clearing locally.");
         } finally {

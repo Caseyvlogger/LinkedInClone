@@ -1,4 +1,4 @@
-import { Input, Button, Dropdown, message, Modal } from "antd";
+import { Input, Button, Dropdown, message, Modal, Spin } from "antd";
 import Navbar from "../components/NavBar";
 import { useState, useEffect, useRef, useCallback } from "react";
 import axiosInstance from "../api/axiosInstance";
@@ -10,6 +10,8 @@ function Feed() {
     const [posts, setPosts] = useState([])
     const fileInputRef = useRef(null);
     const [selectedImage, setSelectedImage] = useState(null);
+    const [meLoading, setMeLoading] = useState(false);
+    const [postsLoading, setPostsLoading] = useState(false);
 
     const handleImageClick = () => {
         fileInputRef.current.click();
@@ -90,8 +92,10 @@ function Feed() {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
+                setMeLoading(true)
                 const response = await axiosInstance.get('auth/me');
                 setUser(response.data);
+                setMeLoading(false)
             } catch (error) {
                 message.error("Failed to load user profile");
             }
@@ -102,9 +106,10 @@ function Feed() {
     useEffect(() => {
         const fetchPosts = async () => {
             try {
+                setPostsLoading(true)
                 const response = await axiosInstance.get('/posts')
                 setPosts(response.data)
-                console.log(response.data)
+                setPostsLoading(false)
             }
             catch (error) {
                 console.error("Error:", error)
@@ -113,7 +118,11 @@ function Feed() {
         }
         fetchPosts();
     }, [])
-
+    if (meLoading) return (
+        <div className="flex h-screen justify-center items-center">
+            <Spin />
+        </div>
+    )
     return (
         <div className="bg-[#f4f2ee] min-h-screen">
             <Navbar />
@@ -165,9 +174,7 @@ function Feed() {
                                 <Button type="text" className="font-semibold text-gray-500">Write article</Button>
                             </div>
                         </div>
-
-                        {/* Example Post */}
-                        {posts.map((post) => (
+                        {postsLoading ? (<Spin />) : (posts.map((post) => (
                             <div key={post._id} className="bg-white rounded-lg border border-gray-200 overflow-hidden">
                                 <div className="flex p-4 gap-2">
                                     <img src="src/assets/avatar-colorful-48.png" className="w-12 h-12 rounded-full" alt="Profile" />
@@ -191,7 +198,9 @@ function Feed() {
                                     <Button type="text" className="font-semibold text-gray-500">Send</Button>
                                 </div>
                             </div>
-                        ))}
+                        )))
+                        }
+
 
                         {/* Sort Dropdown */}
                         <div className="flex items-center gap-1">

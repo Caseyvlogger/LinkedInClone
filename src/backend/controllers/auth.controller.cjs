@@ -1,7 +1,7 @@
 const httpStatus = require('http-status')
 const { userService, tokenService, authService } = require('../services/index.cjs'); // Adjust path if needed
 
-const register = async (req, res) => {
+const register = async (req, res, next) => {
     try {
         const user = await userService.createUser(req.body)
         const tokens = await tokenService.generateAuthTokens(user)

@@ -14,8 +14,8 @@ function SignUp() {
         try {
             const response = await registerUser(values)
 
-            const accessToken = response.data?.tokens?.access?.token;
-            const refreshToken = response.data?.tokens?.refresh?.token;
+            const accessToken = response?.tokens?.access?.token;
+            const refreshToken = response?.tokens?.refresh?.token;
 
             if (accessToken) {
                 localStorage.setItem('accessToken', accessToken);

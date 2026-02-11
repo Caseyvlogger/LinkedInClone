@@ -182,7 +182,13 @@ function Feed() {
                                         <p className="font-semibold text-sm">{post.author?.name}</p>
                                         <p className="text-xs text-gray-500">Software Developer | Technical Writer</p>
                                         <div className="flex items-center gap-1 text-xs text-gray-400">
-                                            <span>1w • </span>
+                                            <span>
+                                                {new Date(post.createdAt).toLocaleDateString('en-US', {
+                                                    month: 'short',
+                                                    day: 'numeric',
+                                                    year: 'numeric'
+                                                })}
+                                            </span>
                                             <img src="src/assets/earth-black-24.png" className="w-3 h-3" alt="Public" />
                                         </div>
                                     </div>

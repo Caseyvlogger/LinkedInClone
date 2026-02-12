@@ -2,7 +2,7 @@ import { Input, Dropdown } from "antd";
 import { useNavigate, Link } from 'react-router-dom'; // Added Link
 import axiosInstance from '../api/axiosInstance.js';
 
-function Navbar() {
+function Navbar(props) {
     const navigate = useNavigate();
 
     const handleLogout = async () => {
@@ -22,7 +22,7 @@ function Navbar() {
             key: '1',
             label: (
                 <div className="flex flex-col p-2">
-                    <span className="font-bold text-sm">Your Name</span>
+                    <span className="font-bold text-sm">{props.user?.name}</span>
                     <span className="text-xs text-gray-500">LinkedIn Clone User</span>
                 </div>
             ),

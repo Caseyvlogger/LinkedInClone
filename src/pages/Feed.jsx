@@ -158,7 +158,7 @@ function Feed() {
     )
     return (
         <div className="bg-[#f4f2ee] min-h-screen">
-            <Navbar />
+            <Navbar user={user} />
 
             <div className="flex flex-col md:flex-row justify-center gap-6 px-4 mt-6 max-w-6xl mx-auto">
 

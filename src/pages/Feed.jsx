@@ -91,6 +91,8 @@ function Feed() {
         if (!window.navigator.onLine) {
             return message.error("You are offline.")
         }
+        //For reverting to old posts if server is down, create a copy.
+        const originalPosts = [...posts];
         //Check user id in likes array.
         const isAlreadyLiked = currentLikes.includes(user?._id);
         //Iterate each post and modify the one that user clicked "Like."
@@ -110,9 +112,8 @@ function Feed() {
             await axiosInstance.post(`posts/${postId}/like`)
         }
         catch (error) {
+            setPosts(originalPosts)
             message.error("Failed to like. Please try again.")
-            const originalPosts = await axiosInstance.get('/posts')
-            setPosts(originalPosts.data)
         }
     }
 

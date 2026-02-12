@@ -52,7 +52,7 @@ function Navbar() {
                     <img src="src/assets/linkedin-colorful-34.png" alt="Logo" />
                 </div>
 
-                <div className="flex flex-row justify-between w-full items-center ml-2 border border-solid">
+                <div className="flex flex-row justify-between w-full items-center ml-2">
                     <Input
                         placeholder="Search"
                         className="max-[601px]:!hidden bg-[#eef3f8] border-none h-[34px] w-[280px] rounded-[4px]"

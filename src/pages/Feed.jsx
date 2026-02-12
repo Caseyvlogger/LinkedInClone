@@ -2,6 +2,8 @@ import { Input, Button, Dropdown, message, Modal, Spin } from "antd";
 import Navbar from "../components/NavBar";
 import { useState, useEffect, useRef, useCallback } from "react";
 import axiosInstance from "../api/axiosInstance";
+import likeIcon from "../assets/icons8-like-16.png";
+import likeBlueIcon from "../assets/icons8-like-blue-16.png";
 
 function Feed() {
     const [user, setUser] = useState(null);
@@ -82,6 +84,36 @@ function Feed() {
         )
         const imgSrc = `data:${post.contentType || 'image/png'};base64,${base64String}`
         return <img src={imgSrc} className="w-full" alt="Post" />
+    }
+
+    const handleLike = async (postId, currentLikes) => {
+        //Check if internet is off.
+        if (!window.navigator.onLine) {
+            return message.error("You are offline.")
+        }
+        //Check user id in likes array.
+        const isAlreadyLiked = currentLikes.includes(user?._id);
+        //Iterate each post and modify the one that user clicked "Like."
+        const updatedPosts = posts.map(p => {
+            if (p._id === postId) {
+                const newLikes = isAlreadyLiked
+                    ? p.likes.filter(id => id !== user._id)
+                    : [...(p.likes || []), user._id]
+                return { ...p, likes: newLikes }
+            }
+            return p;
+        })
+        //Update state to render UI.
+        setPosts(updatedPosts)
+        //Change in backend.
+        try {
+            await axiosInstance.post(`posts/${postId}/like`)
+        }
+        catch (error) {
+            message.error("Failed to like. Please try again.")
+            const originalPosts = await axiosInstance.get('/posts')
+            setPosts(originalPosts.data)
+        }
     }
 
     const items = [
@@ -198,7 +230,20 @@ function Feed() {
                                 </div>
                                 {renderPostImage(post)}
                                 <div className="flex justify-around border-t border-gray-100 py-1 mt-2">
-                                    <Button type="text" className="font-semibold text-gray-500">Like</Button>
+                                    <Button
+                                        type="text"
+                                        className="font-semibold text-gray-500 flex items-center gap-1"
+                                        onClick={() => handleLike(post._id, post.likes || [])}
+                                    >
+                                        <img
+                                            src={post.likes?.includes(user?._id) ? likeBlueIcon : likeIcon}
+                                            alt="like"
+                                            className="w-4 h-4"
+                                        />
+                                        <span style={{ color: post.likes?.includes(user?._id) ? '#0a66c2' : 'inherit' }}>
+                                            Like {post.likes?.length > 0 && post.likes.length}
+                                        </span>
+                                    </Button>
                                     <Button type="text" className="font-semibold text-gray-500">Comment</Button>
                                     <Button type="text" className="font-semibold text-gray-500">Repost</Button>
                                     <Button type="text" className="font-semibold text-gray-500">Send</Button>

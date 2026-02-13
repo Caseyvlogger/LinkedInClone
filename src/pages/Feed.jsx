@@ -11,36 +11,47 @@ function Feed() {
     const [postContent, setPostContent] = useState("");
     const [posts, setPosts] = useState([])
     const fileInputRef = useRef(null);
-    const [selectedImage, setSelectedImage] = useState(null);
+    const [selectedImages, setSelectedImages] = useState([]);
     const [meLoading, setMeLoading] = useState(false);
     const [postsLoading, setPostsLoading] = useState(false);
+    const [imagesLoading, setImagesLoading] = useState(false);
 
     const handleImageClick = () => {
         fileInputRef.current.click();
     };
 
     const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        // 5MB limit
-        if (file.size > 5242880) {
-            message.error("File is too large! Please select an image under 5MB.");
-            return;
+        //grab all files
+        const files = Array.from(e.target.files);
+        if (files.length === 0) return;
+        // Max 5 images per post: Check explorer files (selected) + already selected files.
+        if (files.length + selectedImages.length > 5) {
+            return message.error('Please upload max. 5 images.')
         }
 
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            setSelectedImage(reader.result);
-        };
-        reader.readAsDataURL(file);
+        files.forEach((file) => {
+            //check each file
+            if (file.size > 5245880) {
+                message.error(`${file.name} is over 5MB. Please choose of low size.`)
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setSelectedImages((prev) => [...prev, reader.result])
+            }
+            //For previewing image (Raw binary to Base64)
+            reader.readAsDataURL(file)
+        })
+
+        e.target.value = null;
     };
 
     const showModal = () => setIsModalOpen(true);
     const handleCancel = () => {
         setIsModalOpen(false);
         setPostContent("");
-        setSelectedImage(null);
+        setSelectedImages([]);
     };
 
     const handlePost = useCallback(async () => {
@@ -50,10 +61,12 @@ function Feed() {
             const formData = new FormData();
             formData.append('content', postContent)
 
-            const file = fileInputRef.current.files[0]; //Select first from multiple.
-            if (file) {
-                formData.append('file', file)
+            const files = fileInputRef.current.files
+
+            for (let i = 0; i < files.length; i++) {
+                formData.append('files', files[i])
             }
+
             const response = await axiosInstance.post('/posts', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             })
@@ -63,8 +76,8 @@ function Feed() {
                 message.success("Post created successfully.")
                 setIsModalOpen(false)
                 setPostContent("")
-                setSelectedImage(null)
-                //Refresh posts here.
+                setSelectedImages([])
+                //Refresh posts.
             }
         } catch (error) {
             hideLoading();
@@ -72,7 +85,11 @@ function Feed() {
             const errorMsg = error.response?.data?.message || "Failed to create post.";
             message.error(errorMsg);
         }
-    }, [postContent, setIsModalOpen, setPostContent, setSelectedImage])
+    }, [postContent, setIsModalOpen, setPostContent, setSelectedImages])
+
+    const removeSelectedImage = (indexToRemove) => {
+        setSelectedImages((prev) => prev.filter((_, index) => index !== indexToRemove))
+    }
 
     const renderPostImage = (post) => {
         //check for file
@@ -151,11 +168,13 @@ function Feed() {
         }
         fetchPosts();
     }, [])
+
     if (meLoading) return (
         <div className="flex h-screen justify-center items-center">
             <Spin />
         </div>
     )
+
     return (
         <div className="bg-[#f4f2ee] min-h-screen">
             <Navbar user={user} />
@@ -301,7 +320,7 @@ function Feed() {
                     <Button
                         key="submit"
                         type="primary"
-                        disabled={!postContent.trim()}
+                        disabled={!postContent.trim() && selectedImages.length === 0}
                         onClick={handlePost}
                         className="rounded-full font-semibold"
                     >
@@ -313,7 +332,8 @@ function Feed() {
                     type="file"
                     ref={fileInputRef}
                     onChange={handleFileChange}
-                    accept="image/*"
+                    accept="image/*" //image of any extension.
+                    multiple
                     style={{ display: 'none' }}
                 />
                 <div className="flex items-center gap-2 mb-4">
@@ -327,19 +347,23 @@ function Feed() {
                     rows={4}
                     variant="borderless"
                 />
-                {selectedImage && (
+                {selectedImages.length > 0 && (
                     <div className="relative mt-4">
-                        <img src={selectedImage} alt="Preview" className="w-full max-h-[300px] object-contain rounded-lg" />
-                        <Button
-                            type="primary"
-                            danger
-                            shape="circle"
-                            size="small"
-                            className="absolute top-2 right-2"
-                            onClick={() => setSelectedImage(null)}
-                        >
-                            X
-                        </Button>
+                        {selectedImages.map((imgSrc, index) => (
+                            <div key={index} className="relative group">
+                                <img src={imgSrc} alt={`Preview ${index}`} className="w-full h-32 object-cover rounded-lg" />
+                                <Button
+                                    type="primary"
+                                    danger
+                                    shape="circle"
+                                    size="small"
+                                    className="absolute top-1 right-1 opacity-80 hover:opacity-100"
+                                    onClick={() => removeSelectedImage(index)}
+                                >
+                                    X
+                                </Button>
+                            </div>
+                        ))}
                     </div>
                 )}
             </Modal>

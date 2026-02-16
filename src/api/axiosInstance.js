@@ -3,7 +3,7 @@ import { message } from 'antd';
 
 const axiosInstance = axios.create({
     baseURL: import.meta.env.REACT_APP_API_URL || 'http://localhost:3000/v1',
-    timeout: 5000,
+    timeout: 15000,
     headers: {
         'Content-Type': 'application/json',
     }

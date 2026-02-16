@@ -1,6 +1,6 @@
 import { Input, Button, Dropdown, message, Modal, Spin } from "antd";
 import Navbar from "../components/NavBar";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import axiosInstance from "../api/axiosInstance";
 import likeIcon from "../assets/icons8-like-16.png";
 import likeBlueIcon from "../assets/icons8-like-blue-16.png";
@@ -11,18 +11,20 @@ function Feed() {
     const [postContent, setPostContent] = useState("");
     const [posts, setPosts] = useState([])
     const fileInputRef = useRef(null);
-    const [selectedImages, setSelectedImages] = useState([]);
+    const [selectedImages, setSelectedImages] = useState([]); //Base64 previews.
+    const [rawFiles, setRawFiles] = useState([]); // Actual file objs for backend.
     const [meLoading, setMeLoading] = useState(false);
     const [postsLoading, setPostsLoading] = useState(false);
-    const [imagesLoading, setImagesLoading] = useState(false);
 
     const handleImageClick = () => {
         fileInputRef.current.click();
     };
 
     const handleFileChange = (e) => {
+
         //grab all files
         const files = Array.from(e.target.files);
+
         if (files.length === 0) return;
         // Max 5 images per post: Check explorer files (selected) + already selected files.
         if (files.length + selectedImages.length > 5) {
@@ -31,10 +33,11 @@ function Feed() {
 
         files.forEach((file) => {
             //check each file
-            if (file.size > 5245880) {
-                message.error(`${file.name} is over 5MB. Please choose of low size.`)
-                return;
+            if (file.size > 5242880) {
+                return message.error(`${file.name} is over 5MB. Please choose of low size.`)
             }
+            //Add file if check passes.
+            setRawFiles((prev) => [...prev, file])
 
             const reader = new FileReader();
             reader.onloadend = () => {
@@ -48,24 +51,24 @@ function Feed() {
     };
 
     const showModal = () => setIsModalOpen(true);
+
     const handleCancel = () => {
         setIsModalOpen(false);
         setPostContent("");
         setSelectedImages([]);
+        setRawFiles([])
     };
 
-    const handlePost = useCallback(async () => {
+    const handlePost = async () => {
         const hideLoading = message.loading('Creating post...', 0);
 
         try {
             const formData = new FormData();
             formData.append('content', postContent)
 
-            const files = fileInputRef.current.files
-
-            for (let i = 0; i < files.length; i++) {
-                formData.append('files', files[i])
-            }
+            rawFiles.forEach(file => {
+                formData.append('files', file)
+            })
 
             const response = await axiosInstance.post('/posts', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
@@ -79,28 +82,43 @@ function Feed() {
                 setSelectedImages([])
                 //Refresh posts.
             }
+            setRawFiles([])
         } catch (error) {
             hideLoading();
             console.error("Post creation error:", error);
             const errorMsg = error.response?.data?.message || "Failed to create post.";
             message.error(errorMsg);
         }
-    }, [postContent, setIsModalOpen, setPostContent, setSelectedImages])
+    }
 
     const removeSelectedImage = (indexToRemove) => {
         setSelectedImages((prev) => prev.filter((_, index) => index !== indexToRemove))
+        setRawFiles(prev => prev.filter((_, index) => { index !== indexToRemove }))
     }
 
-    const renderPostImage = (post) => {
+    const renderPostImages = (post) => {
+        console.log(post.images)
         //check for file
-        if (!post.file || !post.file.data) return null
-        //convert buffer to base64 so can display in img
-        const base64String = btoa(
-            new Uint8Array(post.file.data)
-                .reduce((data, byte) => data + String.fromCharCode(byte), '')
+        if (!post.images || post.images.length === 0) return null
+        return (
+            <div className={`grid gap-1 mt-2 ${post.images.length > 1 ? 'grid-cols-2' : 'grid-cols-1'}`} >
+                {post.images.map((imgObj, index) => {
+                    const base64String = btoa(
+                        new Uint8Array(imgObj.file.data)
+                            .reduce((data, byte) => data + String.fromCharCode(byte), '')
+                    )
+                    const imgSrc = `data:${imgObj.contentType || 'image/png'};base64,${base64String}`
+                    return (
+                        <img
+                            key={index}
+                            src={imgSrc}
+                            className="w-full h-48 object-cover rounded-lg"
+                            alt="Post image."
+                        />
+                    )
+                })}
+            </div>
         )
-        const imgSrc = `data:${post.contentType || 'image/png'};base64,${base64String}`
-        return <img src={imgSrc} className="w-full" alt="Post" />
     }
 
     const handleLike = async (postId, currentLikes) => {
@@ -248,7 +266,7 @@ function Feed() {
                                 <div className="px-4 pb-2 text-sm">
                                     <p>{post.content}</p>
                                 </div>
-                                {renderPostImage(post)}
+                                {renderPostImages(post)}
                                 <div className="flex justify-around border-t border-gray-100 py-1 mt-2">
                                     <Button
                                         type="text"

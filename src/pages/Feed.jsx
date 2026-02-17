@@ -1,125 +1,20 @@
-import { Input, Button, Dropdown, message, Modal, Spin } from "antd";
+import { Button, Dropdown, message, Spin } from "antd";
 import Navbar from "../components/NavBar";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import axiosInstance from "../api/axiosInstance";
-import likeIcon from "../assets/icons8-like-16.png";
-import likeBlueIcon from "../assets/icons8-like-blue-16.png";
+import PostModal from "../components/PostModal";
+import PostItem from "../components/PostItem";
 
 function Feed() {
     const [user, setUser] = useState(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [postContent, setPostContent] = useState("");
     const [posts, setPosts] = useState([])
-    const fileInputRef = useRef(null);
-    const [selectedImages, setSelectedImages] = useState([]); //Base64 previews.
-    const [rawFiles, setRawFiles] = useState([]); // Actual file objs for backend.
+
     const [meLoading, setMeLoading] = useState(false);
     const [postsLoading, setPostsLoading] = useState(false);
 
-    const handleImageClick = () => {
-        fileInputRef.current.click();
-    };
-
-    const handleFileChange = (e) => {
-
-        //grab all files
-        const files = Array.from(e.target.files);
-
-        if (files.length === 0) return;
-        // Max 5 images per post: Check explorer files (selected) + already selected files.
-        if (files.length + selectedImages.length > 5) {
-            return message.error('Please upload max. 5 images.')
-        }
-
-        files.forEach((file) => {
-            //check each file
-            if (file.size > 5242880) {
-                return message.error(`${file.name} is over 5MB. Please choose of low size.`)
-            }
-            //Add file if check passes.
-            setRawFiles((prev) => [...prev, file])
-
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setSelectedImages((prev) => [...prev, reader.result])
-            }
-            //For previewing image (Raw binary to Base64)
-            reader.readAsDataURL(file)
-        })
-
-        e.target.value = null;
-    };
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const showModal = () => setIsModalOpen(true);
-
-    const handleCancel = () => {
-        setIsModalOpen(false);
-        setPostContent("");
-        setSelectedImages([]);
-        setRawFiles([])
-    };
-
-    const handlePost = async () => {
-        const hideLoading = message.loading('Creating post...', 0);
-
-        try {
-            const formData = new FormData();
-            formData.append('content', postContent)
-
-            rawFiles.forEach(file => {
-                formData.append('files', file)
-            })
-
-            const response = await axiosInstance.post('/posts', formData, {
-                headers: { 'Content-Type': 'multipart/form-data' }
-            })
-
-            if (response.status === 201) {
-                hideLoading()
-                message.success("Post created successfully.")
-                setIsModalOpen(false)
-                setPostContent("")
-                setSelectedImages([])
-                //Refresh posts.
-            }
-            setRawFiles([])
-        } catch (error) {
-            hideLoading();
-            console.error("Post creation error:", error);
-            const errorMsg = error.response?.data?.message || "Failed to create post.";
-            message.error(errorMsg);
-        }
-    }
-
-    const removeSelectedImage = (indexToRemove) => {
-        setSelectedImages((prev) => prev.filter((_, index) => index !== indexToRemove))
-        setRawFiles(prev => prev.filter((_, index) => { index !== indexToRemove }))
-    }
-
-    const renderPostImages = (post) => {
-        console.log(post.images)
-        //check for file
-        if (!post.images || post.images.length === 0) return null
-        return (
-            <div className={`grid gap-1 mt-2 ${post.images.length > 1 ? 'grid-cols-2' : 'grid-cols-1'}`} >
-                {post.images.map((imgObj, index) => {
-                    const base64String = btoa(
-                        new Uint8Array(imgObj.file.data)
-                            .reduce((data, byte) => data + String.fromCharCode(byte), '')
-                    )
-                    const imgSrc = `data:${imgObj.contentType || 'image/png'};base64,${base64String}`
-                    return (
-                        <img
-                            key={index}
-                            src={imgSrc}
-                            className="w-full h-48 object-cover rounded-lg"
-                            alt="Post image."
-                        />
-                    )
-                })}
-            </div>
-        )
-    }
 
     const handleLike = async (postId, currentLikes) => {
         //Check if internet is off.
@@ -140,7 +35,7 @@ function Feed() {
             }
             return p;
         })
-        //Update state to render UI.
+        //Update state to render UI: Change this.
         setPosts(updatedPosts)
         //Change in backend.
         try {
@@ -244,52 +139,11 @@ function Feed() {
                                 <Button type="text" className="font-semibold text-gray-500">Write article</Button>
                             </div>
                         </div>
+
                         {postsLoading ? (<Spin />) : (posts.map((post) => (
-                            <div key={post._id} className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                                <div className="flex p-4 gap-2">
-                                    <img src="src/assets/avatar-colorful-48.png" className="w-12 h-12 rounded-full" alt="Profile" />
-                                    <div>
-                                        <p className="font-semibold text-sm">{post.author?.name}</p>
-                                        <p className="text-xs text-gray-500">Software Developer | Technical Writer</p>
-                                        <div className="flex items-center gap-1 text-xs text-gray-400">
-                                            <span>
-                                                {new Date(post.createdAt).toLocaleDateString('en-US', {
-                                                    month: 'short',
-                                                    day: 'numeric',
-                                                    year: 'numeric'
-                                                })}
-                                            </span>
-                                            <img src="src/assets/earth-black-24.png" className="w-3 h-3" alt="Public" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="px-4 pb-2 text-sm">
-                                    <p>{post.content}</p>
-                                </div>
-                                {renderPostImages(post)}
-                                <div className="flex justify-around border-t border-gray-100 py-1 mt-2">
-                                    <Button
-                                        type="text"
-                                        className="font-semibold text-gray-500 flex items-center gap-1"
-                                        onClick={() => handleLike(post._id, post.likes || [])}
-                                    >
-                                        <img
-                                            src={post.likes?.includes(user?._id) ? likeBlueIcon : likeIcon}
-                                            alt="like"
-                                            className="w-4 h-4"
-                                        />
-                                        <span style={{ color: post.likes?.includes(user?._id) ? '#0a66c2' : 'inherit' }}>
-                                            Like {post.likes?.length > 0 && post.likes.length}
-                                        </span>
-                                    </Button>
-                                    <Button type="text" className="font-semibold text-gray-500">Comment</Button>
-                                    <Button type="text" className="font-semibold text-gray-500">Repost</Button>
-                                    <Button type="text" className="font-semibold text-gray-500">Send</Button>
-                                </div>
-                            </div>
+                            <PostItem key={post._id} post={post} handleLike={handleLike} user={user} />
                         )))
                         }
-
 
                         {/* Sort Dropdown */}
                         <div className="flex items-center gap-1">
@@ -327,64 +181,7 @@ function Feed() {
             </div>
 
             {/* Post Modal */}
-            <Modal
-                title="Create a post"
-                open={isModalOpen}
-                onCancel={handleCancel}
-                footer={[
-                    <Button key="image" type="text" className="float-left" onClick={handleImageClick}>
-                        📷
-                    </Button>,
-                    <Button
-                        key="submit"
-                        type="primary"
-                        disabled={!postContent.trim() && selectedImages.length === 0}
-                        onClick={handlePost}
-                        className="rounded-full font-semibold"
-                    >
-                        Post
-                    </Button>
-                ]}
-            >
-                <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleFileChange}
-                    accept="image/*" //image of any extension.
-                    multiple
-                    style={{ display: 'none' }}
-                />
-                <div className="flex items-center gap-2 mb-4">
-                    <img src="src/assets/avatar-colorful-48.png" className="w-10 h-10 rounded-full" alt="User" />
-                    <p className="font-semibold">{user?.name} {user?.lastName}</p>
-                </div>
-                <Input.TextArea
-                    placeholder="What do you want to talk about?"
-                    value={postContent}
-                    onChange={(e) => setPostContent(e.target.value)}
-                    rows={4}
-                    variant="borderless"
-                />
-                {selectedImages.length > 0 && (
-                    <div className="relative mt-4">
-                        {selectedImages.map((imgSrc, index) => (
-                            <div key={index} className="relative group">
-                                <img src={imgSrc} alt={`Preview ${index}`} className="w-full h-32 object-cover rounded-lg" />
-                                <Button
-                                    type="primary"
-                                    danger
-                                    shape="circle"
-                                    size="small"
-                                    className="absolute top-1 right-1 opacity-80 hover:opacity-100"
-                                    onClick={() => removeSelectedImage(index)}
-                                >
-                                    X
-                                </Button>
-                            </div>
-                        ))}
-                    </div>
-                )}
-            </Modal>
+            <PostModal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} user={user} />
         </div>
     );
 }

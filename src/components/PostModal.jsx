@@ -10,7 +10,38 @@ const PostModal = ({ setIsModalOpen, isModalOpen, user }) => {
 
     const [postContent, setPostContent] = useState("");
 
+    const [filesLoading, setFilesLoading] = useState(false);
+    const [posting, setPosting] = useState(false);
+
     const fileInputRef = useRef(null);
+
+    //Show Spin or mapped images when filesLoading==true
+    const showSpinOrImages = filesLoading ? (
+        <div className="flex justify-center p-4">
+            <Spin tip="Processing images..." />
+        </div>
+    ) : (
+        selectedImages.length > 0 && (
+            <div className="relative mt-4">
+                {selectedImages.map((imgSrc, index) => (
+                    <div key={index} className="relative group">
+                        <img src={imgSrc} alt={`Preview ${index}`} className="w-full h-32 object-cover rounded-lg" />
+                        <Button
+                            type="primary"
+                            danger
+                            shape="circle"
+                            size="small"
+                            hidden={filesLoading}
+                            className="absolute top-1 right-1 opacity-80 hover:opacity-100"
+                            onClick={() => removeSelectedImage(index)}
+                        >
+                            X
+                        </Button>
+                    </div>
+                ))}
+            </div>
+        )
+    )
 
     const handleImageClick = () => {
         fileInputRef.current.click();
@@ -26,7 +57,7 @@ const PostModal = ({ setIsModalOpen, isModalOpen, user }) => {
         if (files.length + selectedImages.length > 5) {
             return message.error('Please upload max. 5 images.')
         }
-
+        setFilesLoading(true)
         files.forEach((file) => {
             //check each file
             if (file.size > 5242880) {
@@ -42,7 +73,7 @@ const PostModal = ({ setIsModalOpen, isModalOpen, user }) => {
             //For previewing image (Raw binary to Base64)
             reader.readAsDataURL(file)
         })
-
+        setFilesLoading(false)
         e.target.value = null;
     };
 
@@ -57,6 +88,7 @@ const PostModal = ({ setIsModalOpen, isModalOpen, user }) => {
         const hideLoading = message.loading('Creating post...', 0);
 
         try {
+            setPosting(true);
             const formData = new FormData();
             formData.append('content', postContent)
 
@@ -75,9 +107,11 @@ const PostModal = ({ setIsModalOpen, isModalOpen, user }) => {
                 setPostContent("")
                 setSelectedImages([])// CLear only if succeeds (Good for UX).
                 setRawFiles([])
+                setPosting(false)
                 //Refresh posts.
             }
         } catch (error) {
+            setPosting(false)
             hideLoading();
             console.error("Post creation error:", error);
             const errorMsg = error.response?.data?.message || "Failed to create post.";
@@ -102,7 +136,8 @@ const PostModal = ({ setIsModalOpen, isModalOpen, user }) => {
                 <Button
                     key="submit"
                     type="primary"
-                    disabled={!postContent.trim() && selectedImages.length === 0}
+                    loading={posting}
+                    disabled={!postContent.trim() || posting || filesLoading}
                     onClick={handlePost}
                     className="rounded-full font-semibold"
                 >
@@ -129,25 +164,7 @@ const PostModal = ({ setIsModalOpen, isModalOpen, user }) => {
                 rows={4}
                 variant="borderless"
             />
-            {selectedImages.length > 0 && (
-                <div className="relative mt-4">
-                    {selectedImages.map((imgSrc, index) => (
-                        <div key={index} className="relative group">
-                            <img src={imgSrc} alt={`Preview ${index}`} className="w-full h-32 object-cover rounded-lg" />
-                            <Button
-                                type="primary"
-                                danger
-                                shape="circle"
-                                size="small"
-                                className="absolute top-1 right-1 opacity-80 hover:opacity-100"
-                                onClick={() => removeSelectedImage(index)}
-                            >
-                                X
-                            </Button>
-                        </div>
-                    ))}
-                </div>
-            )}
+            {showSpinOrImages}
         </Modal>
     )
 }

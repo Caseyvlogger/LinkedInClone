@@ -73,10 +73,10 @@ const PostModal = ({ setIsModalOpen, isModalOpen, user }) => {
                 message.success("Post created successfully.")
                 setIsModalOpen(false)
                 setPostContent("")
-                setSelectedImages([])
+                setSelectedImages([])// CLear only if succeeds (Good for UX).
+                setRawFiles([])
                 //Refresh posts.
             }
-            setRawFiles([])
         } catch (error) {
             hideLoading();
             console.error("Post creation error:", error);
@@ -87,7 +87,7 @@ const PostModal = ({ setIsModalOpen, isModalOpen, user }) => {
 
     const removeSelectedImage = (indexToRemove) => {
         setSelectedImages((prev) => prev.filter((_, index) => index !== indexToRemove))
-        setRawFiles(prev => prev.filter((_, index) => { index !== indexToRemove }))
+        setRawFiles(prev => prev.filter((_, index) => index !== indexToRemove))
     }
 
     return (

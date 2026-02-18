@@ -3,6 +3,8 @@ import axiosInstance from "../api/axiosInstance";
 
 import { Input, Button, message, Modal } from "antd";
 
+import cameraIcon from '../assets/camera-30.png'
+
 const PostModal = ({ setIsModalOpen, isModalOpen, user }) => {
 
     const [selectedImages, setSelectedImages] = useState([]); //Base64 previews.
@@ -130,9 +132,14 @@ const PostModal = ({ setIsModalOpen, isModalOpen, user }) => {
             open={isModalOpen}
             onCancel={handleCancel}
             footer={[
-                <Button key="image" type="text" className="float-left" onClick={handleImageClick}>
-                    📷
-                </Button>,
+                <Button key="image" type="text" className="float-left" onClick={handleImageClick}
+                    icon={
+                        <img
+                            src={cameraIcon}
+                            alt="upload-icon"
+                            style={{ width: '24px', height: '24px', objectFit: 'contain' }}
+                        />
+                    } />,
                 <Button
                     key="submit"
                     type="primary"

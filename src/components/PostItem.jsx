@@ -1,7 +1,10 @@
-import { Button } from "antd"
+import { useState } from 'react'
+import { Button, Input, message } from "antd"
 
 import likeIcon from "../assets/icons8-like-16.png";
 import likeBlueIcon from "../assets/icons8-like-blue-16.png";
+
+import axiosInstance from '../api/axiosInstance.js'
 
 const renderPostImages = (post) => {
     console.log(post.images)
@@ -23,6 +26,33 @@ const renderPostImages = (post) => {
 }
 
 const PostItem = ({ post, user, handleLike }) => {
+    const [commentText, setCommentText] = useState("");
+    const [isCommenting, setIsCommenting] = useState(false);
+
+    const handleCommentSubmit = async () => {
+        if (!commentText.trim()) return;
+        try {
+            setIsCommenting(true)
+            //send response
+            const response = await axiosInstance.post(`/posts/${post._id}/comments`, {
+                content: commentText,
+            });
+
+            if (response.status === 201) {
+                message.success("Comment added.")
+                setCommentText("")
+                //Refresh comments for Post
+            }
+        }
+        catch (error) {
+            console.error(error)
+            message.error("Failed to load comment.")
+        }
+        finally {
+            setIsCommenting(false)
+        }
+    }
+
     return (
         <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
             <div className="flex p-4 gap-2">
@@ -64,6 +94,36 @@ const PostItem = ({ post, user, handleLike }) => {
                 <Button type="text" className="font-semibold text-gray-500">Comment</Button>
                 <Button type="text" className="font-semibold text-gray-500">Repost</Button>
                 <Button type="text" className="font-semibold text-gray-500">Send</Button>
+            </div>
+            <div className="flex flex-row items-start gap-3 p-4 border-t border-gray-100">
+                <img
+                    src="src/assets/avatar-colorful-48.png"
+                    alt="Avatar"
+                    className="object-cover rounded-full h-[40px] w-[40px] mt-1"
+                />
+                <div className="flex-grow">
+                    <Input
+                        placeholder="Add a comment..."
+                        value={commentText}
+                        onChange={(e) => setCommentText(e.target.value)}
+                        disabled={isCommenting}
+                        onPressEnter={handleCommentSubmit} // Intelligent UX: Submit on Enter
+                        className="rounded-full py-2 px-4 bg-gray-50 hover:bg-gray-100 focus:bg-white"
+                        suffix={
+                            commentText.trim() && (
+                                <Button
+                                    type="primary"
+                                    size="small"
+                                    shape="round"
+                                    loading={isCommenting}
+                                    onClick={handleCommentSubmit}
+                                >
+                                    Post
+                                </Button>
+                            )
+                        }
+                    />
+                </div>
             </div>
         </div>
     )

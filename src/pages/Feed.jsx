@@ -47,6 +47,14 @@ function Feed() {
         }
     }
 
+    const updateCommentCount = (postId) => {
+        setPosts(prevPosts =>
+            prevPosts.map(post =>
+                post._id === postId ? { ...post, commentCount: (post.commentCount || 0) + 1 } : post
+            )
+        )
+    }
+
     const items = [
         { label: 'Most relevant', key: '1' },
         { label: 'Most recent', key: '2' },
@@ -141,7 +149,7 @@ function Feed() {
                         </div>
 
                         {postsLoading ? (<Spin />) : (posts.map((post) => (
-                            <PostItem key={post._id} post={post} handleLike={handleLike} user={user} />
+                            <PostItem key={post._id} post={post} handleLike={handleLike} user={user} updateCommentCount={updateCommentCount} />
                         )))
                         }
 

@@ -1,0 +1,226 @@
+import { useState, useEffect, useCallback } from 'react';
+import { Button, message, Spin, Card, Divider } from 'antd';
+import {
+    UserAddOutlined,
+    CheckCircleOutlined,
+    UserOutlined,
+    CheckOutlined,
+    CloseOutlined
+} from '@ant-design/icons';
+import axiosInstance from '../api/axiosInstance';
+import Navbar from '../components/NavBar';
+
+const Network = () => {
+    const [users, setUsers] = useState([]);
+    const [connections, setConnections] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [connectingId, setConnectingId] = useState(null);
+    const [sentRequestIds, setSentRequestIds] = useState([]);
+    const [actionLoading, setActionLoading] = useState(null);
+
+    const fetchData = useCallback(async () => {
+        try {
+            setLoading(true);
+            const [usersRes, connectionsRes, meRes] = await Promise.all([
+                axiosInstance.get('/users'),
+                axiosInstance.get('/connections'),
+                axiosInstance.get('/auth/me'),
+            ]);
+
+            const allUsers = usersRes.data.results || usersRes.data;
+            const myConnections = connectionsRes.data || [];
+            const myId = String(meRes.data.id || meRes.data._id);
+
+            setUsers(allUsers.filter(u => String(u.id || u._id) !== myId));
+
+            const processedConnections = myConnections.map(c => ({
+                ...c,
+                isRecipient: String(c.recipient?._id || c.recipient) === myId
+            }));
+
+            setConnections(processedConnections);
+        } catch (error) {
+            message.error("Could not load network data. Check your connection.");
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchData();
+    }, [fetchData]);
+
+    const invitations = connections.filter(c =>
+        c.status === 'pending' && c.isRecipient === true
+    );
+
+    const handleConnect = async (recipientId) => {
+        try {
+            setConnectingId(recipientId);
+            const response = await axiosInstance.post(`/connections/request/${recipientId}`);
+
+            if (response.status === 201) {
+                message.success("Connection request sent!");
+                setSentRequestIds((prev) => [...prev, recipientId]);
+            }
+        } catch (error) {
+            message.error(error.response?.data?.message || "Failed to send request.");
+        } finally {
+            setConnectingId(null);
+        }
+    };
+
+    const handleAccept = async (connectionId) => {
+        try {
+            setActionLoading(connectionId);
+            const response = await axiosInstance.patch(`/connections/accept/${connectionId}`);
+
+            if (response.status === 200) {
+                message.success("Invitation accepted!");
+                await fetchData(); // Refresh UI to update connection status
+            }
+        } catch (error) {
+            message.error("Failed to accept invitation.");
+        } finally {
+            setActionLoading(null);
+        }
+    };
+
+    const handleIgnore = (connectionId) => {
+        message.info("Ignore functionality is coming soon.");
+        console.log("Ignored connection ID:", connectionId);
+    };
+
+    const getConnectionStatus = (targetId) => {
+        const tid = String(targetId);
+        const conn = connections.find(c =>
+            (String(c.requester?._id || c.requester) === tid) ||
+            (String(c.recipient?._id || c.recipient) === tid)
+        );
+
+        if (conn?.status === 'accepted') return 'connected';
+        if (conn?.status === 'pending' || sentRequestIds.includes(tid)) return 'pending';
+        return 'none';
+    };
+
+    return (
+        <div className="min-h-screen bg-gray-50">
+            <Navbar />
+            <div className="max-w-6xl mx-auto px-4 py-8">
+                <div className="bg-white rounded-lg border border-gray-200 p-8 mb-8 text-center shadow-sm">
+                    <h1 className="text-3xl font-bold text-gray-800">My Network</h1>
+                    <p className="text-gray-600 mt-2">Grow your circle at Shifa by connecting with others.</p>
+                </div>
+
+                {loading ? (
+                    <div className="flex justify-center items-center h-64"><Spin size="large" /></div>
+                ) : (
+                    <>
+                        {/* Invitations Section */}
+                        {invitations.length > 0 && (
+                            <div className="!mb-8">
+                                <h2 className="!text-xl !font-bold !text-gray-800 !mb-6">Invitations</h2>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                                    {invitations.map((inv) => {
+                                        const requester = inv.requester;
+                                        return (
+                                            <Card key={inv._id} className="!hover:shadow-md !transition-shadow">
+                                                <div className="flex flex-col items-center text-center">
+                                                    <img
+                                                        src={`https://placehold.co/80x80?text=${requester?.name?.[0] || 'U'}`}
+                                                        alt="profile"
+                                                        className="w-20 h-20 rounded-full mb-4 border"
+                                                    />
+                                                    <h3 className="!font-bold !text-gray-800">
+                                                        {requester?.name} {requester?.lastName}
+                                                    </h3>
+                                                    <p className="!text-gray-500 !text-sm !mb-6">Wants to connect</p>
+                                                    <div className="flex gap-2 w-full">
+                                                        <Button
+                                                            type="primary"
+                                                            block
+                                                            icon={<CheckOutlined />}
+                                                            className="!rounded-full !bg-blue-600 !flex !items-center !justify-center"
+                                                            onClick={() => handleAccept(inv._id)}
+                                                            loading={actionLoading === inv._id}
+                                                        >
+                                                            Accept
+                                                        </Button>
+                                                        <Button
+                                                            block
+                                                            icon={<CloseOutlined />}
+                                                            className="!rounded-full !flex !items-center !justify-center"
+                                                            onClick={() => handleIgnore(inv._id)}
+                                                        >
+                                                            Ignore
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            </Card>
+                                        );
+                                    })}
+                                </div>
+                                <Divider className="!my-10" />
+                            </div>
+                        )}
+
+                        {/* Suggestions Section */}
+                        <h2 className="!text-xl !font-bold !text-gray-800 !mb-6">People you may know</h2>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                            {users.map((u) => {
+                                const userId = u.id || u._id;
+                                const status = getConnectionStatus(userId);
+
+                                return (
+                                    <Card key={userId} className="!hover:shadow-md !transition-shadow">
+                                        <div className="flex flex-col items-center">
+                                            <img
+                                                src={`https://placehold.co/80x80?text=${u.name ? u.name[0] : 'U'}`}
+                                                alt="profile"
+                                                className="w-20 h-20 rounded-full mb-4 border"
+                                            />
+                                            <h3 className="!font-bold !text-gray-800">{u.name} {u.lastName}</h3>
+                                            <p className="!text-gray-500 !text-sm !mb-6">Professional at Shifa</p>
+
+                                            {status === 'connected' ? (
+                                                <Button
+                                                    block
+                                                    icon={<UserOutlined />}
+                                                    className="!rounded-full !bg-emerald-50 !border-emerald-200 !text-emerald-600 !font-semibold !cursor-default !hover:bg-emerald-50 !hover:text-emerald-600 !hover:border-emerald-200"
+                                                >
+                                                    Connected
+                                                </Button>
+                                            ) : status === 'pending' ? (
+                                                <Button
+                                                    disabled
+                                                    block
+                                                    icon={<CheckCircleOutlined />}
+                                                    className="!rounded-full !bg-gray-100 !text-gray-500"
+                                                >
+                                                    Pending
+                                                </Button>
+                                            ) : (
+                                                <Button
+                                                    type="default"
+                                                    block
+                                                    className="!rounded-full !border-blue-600 !text-blue-600 !font-bold !hover:bg-blue-50 !flex !items-center !justify-center"
+                                                    onClick={() => handleConnect(userId)}
+                                                    loading={connectingId === userId}
+                                                    icon={connectingId !== userId && <UserAddOutlined />}
+                                                >
+                                                    Connect
+                                                </Button>
+                                            )}
+                                        </div>
+                                    </Card>
+                                );
+                            })}
+                        </div>
+                    </>
+                )}
+            </div>
+        </div>
+    );
+};
+
+export default Network;

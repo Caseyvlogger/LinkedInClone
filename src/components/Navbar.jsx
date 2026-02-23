@@ -60,7 +60,7 @@ function Navbar(props) {
 
                     <div className="flex flex-row items-center">
                         <NavItem icon="src/assets/home-filled-24.png" label="Home" onClick={() => navigate('/feed')} />
-                        <NavItem icon="src/assets/people-24.png" label="My Network" />
+                        <NavItem icon="src/assets/people-24.png" label="My Network" onClick={() => navigate('/network')} />
                         <NavItem icon="src/assets/briefcase-24.png" label="Jobs" />
                         <NavItem icon="src/assets/bubble-24.png" label="Messaging" />
                         <NavItem icon="src/assets/bell-24.png" label="Notifications" />

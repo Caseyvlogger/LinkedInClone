@@ -1,6 +1,6 @@
 import { Button, Dropdown, message, Spin } from "antd";
 import Navbar from "../components/NavBar";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import axiosInstance from "../api/axiosInstance";
 import PostModal from "../components/PostModal";
 import PostItem from "../components/PostItem";
@@ -13,6 +13,45 @@ function Feed() {
     const [postsLoading, setPostsLoading] = useState(false);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const fileInputRef = useRef(null);
+
+    const handleAvatarClick = () => {
+        fileInputRef.current.click();
+    };
+
+    const handleFileChange = async (e) => {
+
+        const file = e.target.files[0];
+        if (!file) return;
+
+        if (file.size > 5 * 1024 * 1024) {
+            return message.error("Image must be less than 5MB");
+        }
+
+        const formData = new FormData();
+        formData.append("image", file);
+
+        try {
+            setMeLoading(true);
+
+            //Axios will automatically set contenttype to multipart formdata
+            const response = await axiosInstance.patch('/auth/me/avatar', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            const updatedUser = response.data.user || response.data;
+            setUser(updatedUser);
+
+            message.success("Profile picture updated!");
+        } catch (error) {
+            message.error("Failed to upload profile picture.");
+        } finally {
+            setMeLoading(false);
+        }
+    };
 
     const showModal = () => setIsModalOpen(true);
 
@@ -105,12 +144,27 @@ function Feed() {
                 {/* Profile Sidebar */}
                 <div className="w-full md:w-[225px] flex-shrink-0 bg-white h-fit rounded-lg overflow-hidden border border-gray-200">
                     <div className="w-full h-[58px] bg-gray-300"></div>
-                    <div className="relative flex justify-center -mt-8">
+                    <div
+                        className="relative flex justify-center -mt-8 cursor-pointer"
+                        onClick={handleAvatarClick}
+                    >
                         <div className="relative">
-                            <img src="src/assets/avatar-colorful-80.png" alt="Avatar" className="w-16 h-16 rounded-full border-2 border-white shadow-sm" />
+                            <img
+                                src={user?.profilePicture || "src/assets/avatar-colorful-80.png"}
+                                alt="Avatar"
+                                className="w-16 h-16 rounded-full border-2 border-white shadow-sm object-cover"
+                            />
                             <div className="flex bg-[#0a66c2] h-5 w-5 rounded-full items-center justify-center absolute bottom-0 right-0 border border-white">
                                 <span className="text-white text-xs font-bold">+</span>
                             </div>
+
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                onChange={handleFileChange}
+                                className="hidden"
+                                accept="image/*"
+                            />
                         </div>
                     </div>
                     <div className="mt-4 text-center px-3 pb-4">

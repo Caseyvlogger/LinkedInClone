@@ -86,9 +86,21 @@ const Network = () => {
         }
     };
 
-    const handleIgnore = (connectionId) => {
-        message.info("Ignore functionality is coming soon.");
-        console.log("Ignored connection ID:", connectionId);
+    const handleIgnore = async (connectionId, requesterId) => {
+
+        if (actionLoading === connectionId) return;
+        const previousConnections = [...connections];
+        setActionLoading(connectionId);
+        setConnections(prev => prev.filter(conn => conn._id !== connectionId));
+        try {
+            await axiosInstance.delete(`/connections/ignore/${requesterId}`);
+            message.success("Invitation ignored.");
+        } catch (error) {
+            setConnections(previousConnections);
+            message.error("Failed to ignore invitation.");
+        } finally {
+            setActionLoading(null);
+        }
     };
 
     const getConnectionStatus = (targetId) => {
@@ -148,9 +160,11 @@ const Network = () => {
                                                         </Button>
                                                         <Button
                                                             block
-                                                            icon={<CloseOutlined />}
+                                                            icon={actionLoading !== inv._id && <CloseOutlined />}
+                                                            loading={actionLoading === inv._id} // Spinner shows during request
+                                                            disabled={actionLoading === inv._id} // Prevent interaction
                                                             className="!rounded-full !flex !items-center !justify-center"
-                                                            onClick={() => handleIgnore(inv._id)}
+                                                            onClick={() => handleIgnore(inv._id, inv.requester._id)}
                                                         >
                                                             Ignore
                                                         </Button>

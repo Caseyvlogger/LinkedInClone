@@ -67,7 +67,7 @@ function Navbar(props) {
 
                         <Dropdown menu={{ items }} trigger={['click']} placement="bottomRight" arrow>
                             <div className="flex flex-col items-center cursor-pointer w-[75px] max-[747px]:w-[50px]">
-                                <img src="src/assets/avatar-colorful-24.png" alt="Me" className="rounded-full w-6 h-6 border border-gray-200" />
+                                <img src={props.user?.profilePicture || "src/assets/avatar-colorful-24.png"} alt="Me" className="rounded-full w-6 h-6 border border-gray-200" />
                                 <div className="flex flex-row items-center">
                                     <p className="text-xs max-[853px]:hidden">Me</p>
                                     <img src="src/assets/arrow-down-10.png" alt="v" className="ml-1" />

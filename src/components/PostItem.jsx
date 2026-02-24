@@ -74,7 +74,7 @@ const PostItem = ({ post, user, handleLike, updateCommentCount }) => {
         <div className="bg-white rounded-lg border border-gray-200 overflow-hidden mb-4">
             {/* Post Header */}
             <div className="flex p-4 gap-2">
-                <img src="src/assets/avatar-colorful-48.png" className="w-12 h-12 rounded-full" alt="Profile" />
+                <img src={post.author?.profilePicture || "src/assets/avatar-colorful-48.png"} className="w-12 h-12 rounded-full" alt="Profile" />
                 <div>
                     <p className="font-semibold text-sm">{post.author?.name} {post.author?.lastName}</p>
                     <p className="text-xs text-gray-500">Software Intern at Shifa</p>
@@ -125,7 +125,7 @@ const PostItem = ({ post, user, handleLike, updateCommentCount }) => {
                 {/* Comment Input Bar */}
                 <div className="flex flex-row items-start gap-3 mb-4">
                     <img
-                        src="src/assets/avatar-colorful-48.png"
+                        src={post.author?.profilePicture || "src/assets/avatar-colorful-48.png"}
                         alt="Avatar"
                         className="object-cover rounded-full h-[32px] w-[32px] mt-1"
                     />
@@ -167,7 +167,7 @@ const PostItem = ({ post, user, handleLike, updateCommentCount }) => {
                     <div className="space-y-3 mt-4">
                         {comments.map((comment) => (
                             <div key={comment._id} className="flex gap-2">
-                                <img src="src/assets/avatar-colorful-48.png" className="w-8 h-8 rounded-full" alt="user" />
+                                <img src={comment.author?.profilePicture || "src/assets/avatar-colorful-48.png"} className="w-8 h-8 rounded-full" alt="user" />
                                 <div className="flex-1">
                                     <div className="bg-gray-100 p-2 rounded-lg">
                                         <p className="font-bold text-[12px]">{comment.author?.name} {comment.author?.lastName}</p>

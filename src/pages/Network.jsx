@@ -11,6 +11,8 @@ import axiosInstance from '../api/axiosInstance';
 import Navbar from '../components/NavBar';
 
 const Network = () => {
+
+    const [user, setUser] = useState([]);
     const [users, setUsers] = useState([]);
     const [connections, setConnections] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -30,7 +32,7 @@ const Network = () => {
             const allUsers = usersRes.data.results || usersRes.data;
             const myConnections = connectionsRes.data || [];
             const myId = String(meRes.data.id || meRes.data._id);
-
+            setUser(meRes.data)
             setUsers(allUsers.filter(u => String(u.id || u._id) !== myId));
 
             const processedConnections = myConnections.map(c => ({
@@ -117,7 +119,7 @@ const Network = () => {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            <Navbar />
+            <Navbar user={user} />
             <div className="max-w-6xl mx-auto px-4 py-8">
                 <div className="bg-white rounded-lg border border-gray-200 p-8 mb-8 text-center shadow-sm">
                     <h1 className="text-3xl font-bold text-gray-800">My Network</h1>
@@ -139,7 +141,7 @@ const Network = () => {
                                             <Card key={inv._id} className="!hover:shadow-md !transition-shadow">
                                                 <div className="flex flex-col items-center text-center">
                                                     <img
-                                                        src={`https://placehold.co/80x80?text=${requester?.name?.[0] || 'U'}`}
+                                                        src={requester.profilePicture || `https://placehold.co/80x80?text=${requester.name ? requester.name[0] : 'U'}`}
                                                         alt="profile"
                                                         className="w-20 h-20 rounded-full mb-4 border"
                                                     />
@@ -189,7 +191,7 @@ const Network = () => {
                                     <Card key={userId} className="!hover:shadow-md !transition-shadow">
                                         <div className="flex flex-col items-center">
                                             <img
-                                                src={`https://placehold.co/80x80?text=${u.name ? u.name[0] : 'U'}`}
+                                                src={u.profilePicture || `https://placehold.co/80x80?text=${u.name ? u.name[0] : 'U'}`}
                                                 alt="profile"
                                                 className="w-20 h-20 rounded-full mb-4 border"
                                             />

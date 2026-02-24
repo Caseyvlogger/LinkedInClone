@@ -161,7 +161,7 @@ const PostModal = ({ setIsModalOpen, isModalOpen, user }) => {
                 style={{ display: 'none' }}
             />
             <div className="flex items-center gap-2 mb-4">
-                <img src="src/assets/avatar-colorful-48.png" className="w-10 h-10 rounded-full" alt="User" />
+                <img src={user?.profilePicture || "src/assets/avatar-colorful-48.png"} className="w-10 h-10 rounded-full" alt="User" />
                 <p className="font-semibold">{user?.name} {user?.lastName}</p>
             </div>
             <Input.TextArea

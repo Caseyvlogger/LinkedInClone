@@ -187,7 +187,7 @@ function Feed() {
                         {/* Start a post box */}
                         <div className="bg-white rounded-lg border border-gray-200 p-4">
                             <div className="flex gap-2">
-                                <img src="src/assets/avatar-colorful-48.png" className="w-12 h-12 rounded-full" alt="Avatar" />
+                                <img src={user?.profilePicture || "src/assets/avatar-colorful-48.png"} className="w-12 h-12 rounded-full" alt="Avatar" />
                                 <Button
                                     onClick={showModal}
                                     className="flex-grow rounded-full text-left px-5 h-12 text-gray-500 font-semibold hover:bg-gray-100"

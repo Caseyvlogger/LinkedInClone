@@ -23,21 +23,23 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
     (response) => response,
     (error) => {
-        console.log("INTERCEPTOR HIT!");
-        console.log("Status Code:", error.response?.status);
-        //server sent response but some error happened.
         if (error.response) {
-            if (error.response?.status === 401) {
-                if (window.location.pathname !== '/signin') {
-                    localStorage.clear();
-                    window.location.href = '/signin';
-                }
+            const { status, data } = error.response;
+
+            if (status === 401 && window.location.pathname !== '/signin') {
+                localStorage.clear();
+                window.location.href = '/signin';
             }
+
+            message.error(data?.message || "An error occurred");
         }
-        //server off or no internet.
-        if (error.request) {
-            console.error("Server unreachable.")
-            message.error("Server down.")
+
+        else if (error.request) {
+            console.error("No response received from server.");
+            message.error("Network Error: Server unreachable.");
+        }
+        else {
+            message.error("Request Error: " + error.message);
         }
         return Promise.reject(error);
     }

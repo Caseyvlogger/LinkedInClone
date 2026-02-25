@@ -93,15 +93,15 @@ const Network = () => {
         if (actionLoading === connectionId) return;
         const previousConnections = [...connections];
         setActionLoading(connectionId);
-        setConnections(prev => prev.filter(conn => conn._id !== connectionId));
+        setConnections(prev => prev.filter(conn => conn._id !== connectionId));//Optimistic UI Update
         try {
             await axiosInstance.delete(`/connections/ignore/${requesterId}`);
             message.success("Invitation ignored.");
         } catch (error) {
-            setConnections(previousConnections);
+            setConnections(previousConnections);//Revert to original in case of error
             message.error("Failed to ignore invitation.");
         } finally {
-            setActionLoading(null);
+            setActionLoading(null);//flush connectionId.
         }
     };
 

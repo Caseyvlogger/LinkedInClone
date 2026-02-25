@@ -11,16 +11,19 @@ const renderPostImages = (post) => {
     //check for file
     if (!post.images || post.images.length === 0) return null
     return (
-        <div className={`grid gap-1 mt-2 ${post.images.length > 1 ? 'grid-cols-2' : 'grid-cols-1'}`} >
-            {post.images.map((imgUrl, index) =>
+        <div className={`grid gap-1 mt-2 mx-4 ${post.images.length > 1 ? 'grid-cols-2' : 'grid-cols-1'}`} >
+            {post.images.map((imgUrl, index) => (
                 <img
                     key={index}
                     src={imgUrl}
-                    className="w-full h-48 object-cover rounded-lg"
-                    alt="Post image."
+                    className={`rounded-lg object-cover ${post.images.length === 1
+                        ? 'max-w-full max-h-[400px] w-auto h-auto mx-auto'
+                        : 'w-full h-48'
+                        }`}
+                    alt="Post content"
                     loading="lazy"
                 />
-            )}
+            ))}
         </div>
     )
 }

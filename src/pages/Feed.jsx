@@ -68,10 +68,13 @@ function Feed() {
         const updatedPosts = posts.map(p => {
             if (p._id === postId) {
                 const newLikes = isAlreadyLiked
+                    //Toggle like
                     ? p.likes.filter(id => id !== user._id)
+                    //Add user's id to likes array to represent "liked."
                     : [...(p.likes || []), user._id]
                 return { ...p, likes: newLikes }
             }
+            //else return each post to set in "posts" state.
             return p;
         })
         //Update state to render UI: Change this.
@@ -81,6 +84,7 @@ function Feed() {
             await axiosInstance.post(`posts/${postId}/like`)
         }
         catch (error) {
+            //Revert back to originalPosts.
             setPosts(originalPosts)
             message.error("Failed to like. Please try again.")
         }

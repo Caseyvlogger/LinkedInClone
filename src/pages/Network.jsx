@@ -122,32 +122,25 @@ const Network = () => {
     };
 
     const handleCancelConnection = async (targetId) => {
-        const connectionToCancel = connections.find(c =>
-            String(c.recipient?._id || c.recipient) === String(targetId) &&
-            c.status === 'pending'
-        );
-
-        if (!connectionToCancel) {
-            setSentRequestIds(prev => prev.filter(id => id !== targetId));
-            return;
-        }
-
-        const connectionId = connectionToCancel._id;
-        const previousConnections = [...connections];
-
         try {
+            // disable button: Spinner
             setCancelLoadingId(targetId);
-            setConnections(prev => prev.filter(conn => conn._id !== connectionId));
-            setSentRequestIds(prev => prev.filter(id => id !== targetId));
-            console.log("recipient:", targetId)
-            console.log("connection", connectionId)
-            console.log("requester:", user.id || user._id)
+
             await axiosInstance.delete(`/connections/cancel/${targetId}`);
+
+            // remove user from "sent" tracking array
+            setSentRequestIds(prev => prev.filter(id => id !== targetId));
+
+            // remove connection from main list
+            setConnections(prev => prev.filter(c =>
+                !(String(c.recipient?._id || c.recipient) === String(targetId) && c.status === 'pending')
+            ));
+
             message.success("Connection request withdrawn.");
         } catch (error) {
-            setConnections(previousConnections);
-            message.error("Failed to withdraw request.");
+            message.error(error.response?.data?.message || "Failed to cancel request.");
         } finally {
+            // 5. Re-enable the button regardless of outcome
             setCancelLoadingId(null);
         }
     };
@@ -253,9 +246,10 @@ const Network = () => {
 
                                                     <Button
                                                         danger
-                                                        icon={cancelLoadingId !== userId && <CloseOutlined />}
+                                                        // Button turns into a spinner and becomes unclickable while request is in flight
                                                         loading={cancelLoadingId === userId}
                                                         disabled={cancelLoadingId === userId}
+                                                        icon={cancelLoadingId !== userId && <CloseOutlined />}
                                                         className="!rounded-full !flex !items-center hover:!bg-red-50"
                                                         onClick={() => handleCancelConnection(userId)}
                                                     >

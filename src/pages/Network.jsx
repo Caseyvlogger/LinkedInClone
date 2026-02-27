@@ -15,18 +15,21 @@ const Network = () => {
     const [user, setUser] = useState([]);
     const [users, setUsers] = useState([]);
     const [connections, setConnections] = useState([]);
+    const [connectedConnections, setConnectedConnections] = useState([]);
     const [loading, setLoading] = useState(true);
     const [connectingId, setConnectingId] = useState(null);
+    const [cancelLoadingId, setCancelLoadingId] = useState(null);
     const [sentRequestIds, setSentRequestIds] = useState([]);
     const [actionLoading, setActionLoading] = useState(null);
 
     const fetchData = useCallback(async () => {
         try {
             setLoading(true);
-            const [usersRes, connectionsRes, meRes] = await Promise.all([
+            const [usersRes, connectionsRes, meRes, connectedRes] = await Promise.all([
                 axiosInstance.get('/users'),
                 axiosInstance.get('/connections'),
                 axiosInstance.get('/auth/me'),
+                axiosInstance.get('/connections/my-connections'),
             ]);
 
             const allUsers = usersRes.data.results || usersRes.data;
@@ -34,7 +37,8 @@ const Network = () => {
             const myId = String(meRes.data.id || meRes.data._id);
             setUser(meRes.data)
             setUsers(allUsers.filter(u => String(u.id || u._id) !== myId));
-
+            setConnectedConnections(connectedRes.data)
+            console.log("connectedRes:", connectedRes)
             const processedConnections = myConnections.map(c => ({
                 ...c,
                 isRecipient: String(c.recipient?._id || c.recipient) === myId
@@ -115,6 +119,37 @@ const Network = () => {
         if (conn?.status === 'accepted') return 'connected';
         if (conn?.status === 'pending' || sentRequestIds.includes(tid)) return 'pending';
         return 'none';
+    };
+
+    const handleCancelConnection = async (targetId) => {
+        const connectionToCancel = connections.find(c =>
+            String(c.recipient?._id || c.recipient) === String(targetId) &&
+            c.status === 'pending'
+        );
+
+        if (!connectionToCancel) {
+            setSentRequestIds(prev => prev.filter(id => id !== targetId));
+            return;
+        }
+
+        const connectionId = connectionToCancel._id;
+        const previousConnections = [...connections];
+
+        try {
+            setCancelLoadingId(targetId);
+            setConnections(prev => prev.filter(conn => conn._id !== connectionId));
+            setSentRequestIds(prev => prev.filter(id => id !== targetId));
+            console.log("recipient:", targetId)
+            console.log("connection", connectionId)
+            console.log("requester:", user.id || user._id)
+            await axiosInstance.delete(`/connections/cancel/${targetId}`);
+            message.success("Connection request withdrawn.");
+        } catch (error) {
+            setConnections(previousConnections);
+            message.error("Failed to withdraw request.");
+        } finally {
+            setCancelLoadingId(null);
+        }
     };
 
     return (
@@ -207,14 +242,26 @@ const Network = () => {
                                                     Connected
                                                 </Button>
                                             ) : status === 'pending' ? (
-                                                <Button
-                                                    disabled
-                                                    block
-                                                    icon={<CheckCircleOutlined />}
-                                                    className="!rounded-full !bg-gray-100 !text-gray-500"
-                                                >
-                                                    Pending
-                                                </Button>
+                                                <div className="flex flex-row gap-2">
+                                                    <Button
+                                                        disabled
+                                                        icon={<CheckCircleOutlined />}
+                                                        className="!rounded-full !bg-gray-100 !text-gray-400"
+                                                    >
+                                                        Pending
+                                                    </Button>
+
+                                                    <Button
+                                                        danger
+                                                        icon={cancelLoadingId !== userId && <CloseOutlined />}
+                                                        loading={cancelLoadingId === userId}
+                                                        disabled={cancelLoadingId === userId}
+                                                        className="!rounded-full !flex !items-center hover:!bg-red-50"
+                                                        onClick={() => handleCancelConnection(userId)}
+                                                    >
+                                                        Cancel
+                                                    </Button>
+                                                </div>
                                             ) : (
                                                 <Button
                                                     type="default"
@@ -232,6 +279,46 @@ const Network = () => {
                                 );
                             })}
                         </div>
+                        {/* Connections */}
+                        {connectedConnections.length > 0 && (
+                            <div className="mb-10">
+                                <h2 className="text-xl font-bold text-gray-800 mb-6">
+                                    My Network ({connectedConnections.length})
+                                </h2>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                                    {connectedConnections.map((conn) => {
+                                        // Determine which side of the connection is NOT you
+                                        const connectionData = String(conn.requester._id) === String(user?._id || user?.id)
+                                            ? conn.recipient
+                                            : conn.requester;
+
+                                        return (
+                                            <Card key={conn._id} className="!hover:shadow-md transition-shadow text-center">
+                                                <div className="flex flex-col items-center">
+                                                    <img
+                                                        src={connectionData.profilePicture || `https://placehold.co/80x80?text=${connectionData.name[0]}`}
+                                                        alt="connection"
+                                                        className="w-20 h-20 rounded-full border-2 border-gray-100 object-cover mb-3"
+                                                    />
+                                                    <div className="font-bold text-lg text-gray-900">
+                                                        {connectionData.name} {connectionData.lastName}
+                                                    </div>
+                                                    <div className="text-gray-500 text-sm mb-4">Connection</div>
+                                                    <Button
+                                                        type="primary"
+                                                        ghost
+                                                        className="!rounded-full w-full !border-blue-600 !text-blue-600"
+                                                    >
+                                                        Message
+                                                    </Button>
+                                                </div>
+                                            </Card>
+                                        );
+                                    })}
+                                </div>
+                                <Divider />
+                            </div>
+                        )}
                     </>
                 )}
             </div>

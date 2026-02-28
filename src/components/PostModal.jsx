@@ -36,6 +36,7 @@ const PostModal = ({ setIsModalOpen, isModalOpen, user }) => {
                             hidden={filesLoading}
                             className="absolute top-1 right-1 opacity-80 hover:opacity-100"
                             onClick={() => removeSelectedImage(index)}
+                            disabled={posting || filesLoading}
                         >
                             X
                         </Button>
@@ -131,8 +132,12 @@ const PostModal = ({ setIsModalOpen, isModalOpen, user }) => {
             title="Create a post"
             open={isModalOpen}
             onCancel={handleCancel}
+            closable={!posting}
+            maskClosable={!posting}
+            keyboard={!posting}
             footer={[
                 <Button key="image" type="text" className="float-left" onClick={handleImageClick}
+                    disabled={posting || filesLoading}
                     icon={
                         <img
                             src={cameraIcon}

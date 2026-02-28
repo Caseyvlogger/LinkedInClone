@@ -57,13 +57,27 @@ const PostItem = ({ post, user, handleLike, updateCommentCount }) => {
             });
 
             if (response.status === 201) { // httpStatus.status.CREATED
-                message.success("Comment added.");
-                setCommentText("");
 
-                setComments((prev) => [response.data, ...prev]);
+                const newComment = response.data;
+
+                if (comments.length === 0 && post.commentCount > 0) {
+
+                    await handleLoadComments();
+                    // If does not exist, add new
+                    setComments(prev => {
+                        const exists = prev.find(c => c._id === newComment._id);
+                        return exists ? prev : [newComment, ...prev];
+                    });
+                } else {
+                    // If list already open or no comments, add new
+                    setComments((prev) => [newComment, ...prev]);
+                }
+
+                setCommentText("");
                 if (updateCommentCount) {
                     updateCommentCount(post._id)
                 }
+                message.success("Comment added.");
             }
         } catch (error) {
             console.error(error);

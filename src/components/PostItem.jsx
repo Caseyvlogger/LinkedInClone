@@ -142,7 +142,7 @@ const PostItem = ({ post, user, handleLike, updateCommentCount }) => {
                 {/* Comment Input Bar */}
                 <div className="flex flex-row items-start gap-3 mb-4">
                     <img
-                        src={post.author?.profilePicture || "src/assets/avatar-colorful-48.png"}
+                        src={user?.profilePicture || "src/assets/avatar-colorful-48.png"}
                         alt="Avatar"
                         className="object-cover rounded-full h-[32px] w-[32px] mt-1"
                     />

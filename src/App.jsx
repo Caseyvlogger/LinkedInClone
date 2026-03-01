@@ -8,6 +8,7 @@ import SignIn from "./pages/SignIn.jsx"
 import PrivateRoute from "./components/PrivateRoute.jsx"
 import PublicRoute from "./components/PublicRoute.jsx"
 import Network from "./pages/Network.jsx"
+import MyActivity from "./pages/MyActivity.jsx"
 
 function App() {
 
@@ -38,6 +39,12 @@ function App() {
       <Route path='/network' element={
         <PrivateRoute>
           <Network />
+        </PrivateRoute>
+      } />
+
+      <Route path='/my-activity' element={
+        <PrivateRoute>
+          <MyActivity />
         </PrivateRoute>
       } />
 

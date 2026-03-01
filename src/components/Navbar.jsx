@@ -33,6 +33,10 @@ function Navbar(props) {
             label: <Link to="/profile">View Profile</Link>,
         },
         {
+            key: 'activity',
+            label: <Link to="/my-activity">My Activity</Link>,
+        },
+        {
             key: '3',
             label: 'Settings & Privacy',
         },

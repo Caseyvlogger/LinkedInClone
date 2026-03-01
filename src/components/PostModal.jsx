@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import axiosInstance from "../api/axiosInstance";
 
-import { Input, Button, message, Modal } from "antd";
+import { Input, Button, message, Modal, Spin } from "antd";
 
 import cameraIcon from '../assets/camera-30.png'
 
@@ -50,34 +50,55 @@ const PostModal = ({ setIsModalOpen, isModalOpen, user }) => {
         fileInputRef.current.click();
     };
 
-    const handleFileChange = (e) => {
-
-        //grab all files
+    const handleFileChange = async (e) => { // 1. Make this function async
         const files = Array.from(e.target.files);
 
         if (files.length === 0) return;
-        // Max 5 images per post: Check explorer files (selected) + already selected files.
-        if (files.length + selectedImages.length > 5) {
-            return message.error('Please upload max. 5 images.')
-        }
-        setFilesLoading(true)
-        files.forEach((file) => {
-            //check each file
-            if (file.size > 5242880) {
-                return message.error(`${file.name} is over 5MB. Please choose of low size.`)
-            }
-            //Add file if check passes.
-            setRawFiles((prev) => [...prev, file])
 
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setSelectedImages((prev) => [...prev, reader.result])
-            }
-            //For previewing image (Raw binary to Base64)
-            reader.readAsDataURL(file)
-        })
-        setFilesLoading(false)
-        e.target.value = null;
+        if (files.length + selectedImages.length > 5) {
+            return message.error('Please upload max. 5 images.');
+        }
+
+        setFilesLoading(true);
+
+        try {
+            // 2. Create a Promise for each file so we can 'wait' for them
+            const filePromises = files.map((file) => {
+                return new Promise((resolve, reject) => {
+                    // Check size (5MB limit)
+                    if (file.size > 5242880) {
+                        message.error(`${file.name} is over 5MB. Please select images again.`);
+                        return reject(new Error("File too large"));
+                    }
+
+                    const reader = new FileReader();
+                    // 3. Resolve the promise ONLY when the file is fully read
+                    reader.onload = () => resolve({
+                        base64: reader.result,
+                        file: file
+                    });
+                    reader.onerror = (err) => reject(err);
+                    reader.readAsDataURL(file);
+                });
+            });
+
+            // 4. Wait for ALL files to be ready before moving forward
+            const results = await Promise.all(filePromises);
+
+            // 5. Update state ONCE with all new items (Best Practice) [cite: 2026-02-18]
+            const newBase64s = results.map(r => r.base64);
+            const newFiles = results.map(r => r.file);
+
+            setSelectedImages((prev) => [...prev, ...newBase64s]);
+            setRawFiles((prev) => [...prev, ...newFiles]);
+
+        } catch (error) {
+            console.error("File processing error:", error);
+        } finally {
+            // 6. NOW it is safe to turn off the loading spinner
+            setFilesLoading(false);
+            e.target.value = null; // Correctly kept to allow re-selecting same file
+        }
     };
 
     const handleCancel = () => {

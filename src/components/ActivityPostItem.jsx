@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { Button, Space, Divider, message } from "antd";
+import { Button, Space, Divider, message, Popconfirm } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import axiosInstance from "../api/axiosInstance";
 
-const ActivityPostItem = ({ post }) => {
+const ActivityPostItem = ({ post, onDeleteSuccess }) => {
     const [comments, setComments] = useState([]);
     const [loadingComments, setLoadingComments] = useState(false);
 
@@ -16,6 +16,22 @@ const ActivityPostItem = ({ post }) => {
             message.error("Failed to load comments.");
         } finally {
             setLoadingComments(false);
+        }
+    };
+
+    const [isDeleting, setIsDeleting] = useState(false);
+
+    const handleDelete = async () => {
+        try {
+            setIsDeleting(true);
+            await axiosInstance.delete(`/posts/${post._id}`);
+            message.success("Post deleted successfully");
+            onDeleteSuccess(post._id);
+        } catch (error) {
+            message.error("Failed to delete post. Please try again.");
+            console.error(error);
+        } finally {
+            setIsDeleting(false);
         }
     };
 
@@ -60,7 +76,23 @@ const ActivityPostItem = ({ post }) => {
 
                 <Space>
                     <Button icon={<EditOutlined />} type="text" className="text-blue-600">Edit</Button>
-                    <Button icon={<DeleteOutlined />} type="text" danger>Delete</Button>
+                    <Popconfirm
+                        title="Delete the post"
+                        description="Are you sure you want to delete this post?"
+                        onConfirm={handleDelete}
+                        okText="Yes"
+                        cancelText="No"
+                        okButtonProps={{ loading: isDeleting, danger: true }}
+                    >
+                        <Button
+                            icon={<DeleteOutlined />}
+                            type="text"
+                            danger
+                            loading={isDeleting}
+                        >
+                            Delete
+                        </Button>
+                    </Popconfirm>
                 </Space>
             </div>
 

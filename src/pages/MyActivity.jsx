@@ -9,6 +9,11 @@ function MyActivity() {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    const handleDeletePostState = (postId) => {
+        // Filter out the deleted post from the current state
+        setPosts(prevPosts => prevPosts.filter(post => post._id !== postId));
+    };
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -40,7 +45,7 @@ function MyActivity() {
                 {loading ? (
                     <div className="flex justify-center p-10"><Spin size="large" /></div>
                 ) : posts.length > 0 ? (
-                    posts.map(post => <ActivityPostItem key={post._id} post={post} />)
+                    posts.map(post => <ActivityPostItem key={post._id} post={post} onDeleteSuccess={handleDeletePostState} />)
                 ) : (
                     <div className="bg-white p-10 rounded-lg border border-gray-200">
                         <Empty description="You haven't posted anything yet." />

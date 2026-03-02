@@ -50,7 +50,7 @@ const PostModal = ({ setIsModalOpen, isModalOpen, user }) => {
         fileInputRef.current.click();
     };
 
-    const handleFileChange = async (e) => { // 1. Make this function async
+    const handleFileChange = async (e) => {
         const files = Array.from(e.target.files);
 
         if (files.length === 0) return;
@@ -62,7 +62,6 @@ const PostModal = ({ setIsModalOpen, isModalOpen, user }) => {
         setFilesLoading(true);
 
         try {
-            // 2. Create a Promise for each file so we can 'wait' for them
             const filePromises = files.map((file) => {
                 return new Promise((resolve, reject) => {
                     // Check size (5MB limit)
@@ -72,7 +71,6 @@ const PostModal = ({ setIsModalOpen, isModalOpen, user }) => {
                     }
 
                     const reader = new FileReader();
-                    // 3. Resolve the promise ONLY when the file is fully read
                     reader.onload = () => resolve({
                         base64: reader.result,
                         file: file
@@ -82,10 +80,9 @@ const PostModal = ({ setIsModalOpen, isModalOpen, user }) => {
                 });
             });
 
-            // 4. Wait for ALL files to be ready before moving forward
+
             const results = await Promise.all(filePromises);
 
-            // 5. Update state ONCE with all new items (Best Practice) [cite: 2026-02-18]
             const newBase64s = results.map(r => r.base64);
             const newFiles = results.map(r => r.file);
 
@@ -95,9 +92,8 @@ const PostModal = ({ setIsModalOpen, isModalOpen, user }) => {
         } catch (error) {
             console.error("File processing error:", error);
         } finally {
-            // 6. NOW it is safe to turn off the loading spinner
             setFilesLoading(false);
-            e.target.value = null; // Correctly kept to allow re-selecting same file
+            e.target.value = null;
         }
     };
 

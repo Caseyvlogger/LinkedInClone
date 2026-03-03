@@ -2,10 +2,33 @@ import { useState } from "react";
 import { Button, Space, Divider, message, Popconfirm } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import axiosInstance from "../api/axiosInstance";
+import EditPostModal from "./EditPostModal";
 
-const ActivityPostItem = ({ post, onDeleteSuccess }) => {
+const ActivityPostItem = ({ post: initialPost, onDeleteSuccess, user }) => {
+    const [post, setPost] = useState(initialPost);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
     const [comments, setComments] = useState([]);
     const [loadingComments, setLoadingComments] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
+
+    const handleUpdateSuccess = (updatedPost) => {
+        setPost(updatedPost);
+        message.success("Post updated successfully");
+    };
+
+    const handleDelete = async () => {
+        try {
+            setIsDeleting(true);
+            await axiosInstance.delete(`/posts/${post._id}`);
+            message.success("Post deleted successfully");
+            onDeleteSuccess(post._id);
+        } catch (error) {
+            message.error("Failed to delete post.");
+        } finally {
+            setIsDeleting(false);
+        }
+    };
 
     const handleLoadComments = async () => {
         try {
@@ -16,22 +39,6 @@ const ActivityPostItem = ({ post, onDeleteSuccess }) => {
             message.error("Failed to load comments.");
         } finally {
             setLoadingComments(false);
-        }
-    };
-
-    const [isDeleting, setIsDeleting] = useState(false);
-
-    const handleDelete = async () => {
-        try {
-            setIsDeleting(true);
-            await axiosInstance.delete(`/posts/${post._id}`);
-            message.success("Post deleted successfully");
-            onDeleteSuccess(post._id);
-        } catch (error) {
-            message.error("Failed to delete post. Please try again.");
-            console.error(error);
-        } finally {
-            setIsDeleting(false);
         }
     };
 
@@ -56,7 +63,6 @@ const ActivityPostItem = ({ post, onDeleteSuccess }) => {
 
     return (
         <div className="bg-white rounded-lg border border-gray-200 pt-3 pb-4 mb-4 shadow-sm">
-            {/* Header: Author & Actions */}
             <div className="flex justify-between items-start px-4 mb-2">
                 <div className="flex gap-2">
                     <img
@@ -75,87 +81,67 @@ const ActivityPostItem = ({ post, onDeleteSuccess }) => {
                 </div>
 
                 <Space>
-                    <Button icon={<EditOutlined />} type="text" className="text-blue-600">Edit</Button>
+                    {/* EDIT BUTTON */}
+                    <Button
+                        icon={<EditOutlined />}
+                        type="text"
+                        className="text-blue-600"
+                        onClick={() => setIsEditModalOpen(true)}
+                    >
+                        Edit
+                    </Button>
+
                     <Popconfirm
                         title="Delete the post"
-                        description="Are you sure you want to delete this post?"
+                        description="Are you sure to delete this post?"
                         onConfirm={handleDelete}
                         okText="Yes"
                         cancelText="No"
-                        okButtonProps={{ loading: isDeleting, danger: true }}
                     >
-                        <Button
-                            icon={<DeleteOutlined />}
-                            type="text"
-                            danger
-                            loading={isDeleting}
-                        >
+                        <Button icon={<DeleteOutlined />} type="text" danger loading={isDeleting}>
                             Delete
                         </Button>
                     </Popconfirm>
                 </Space>
             </div>
 
-            {/* Post Content */}
             <div className="px-4 text-sm text-gray-800 whitespace-pre-wrap">
                 {post.content}
             </div>
 
-            {/* Post Images */}
             {renderPostImages(post.images)}
 
             <Divider className="my-3" />
 
-            {/* Statistics */}
-            <div className="px-4 flex justify-between text-xs text-gray-500 mb-2">
+            <div className="px-4 flex justify-between text-xs text-gray-500">
                 <span>{post.likes?.length || 0} Likes</span>
-                <span>{post.commentCount || 0} Comments</span>
+                <span className="cursor-pointer hover:underline" onClick={handleLoadComments}>
+                    {post.commentCount || 0} Comments
+                </span>
             </div>
 
-            {/* Comments Section */}
-            <div className="px-4 border-t border-gray-100 pt-2">
-                {comments.length === 0 ? (
-                    post.commentCount > 0 && (
-                        <Button
-                            type="link"
-                            onClick={handleLoadComments}
-                            loading={loadingComments}
-                            className="text-gray-500 text-xs p-0"
-                        >
-                            Load comments...
-                        </Button>
-                    )
-                ) : (
-                    <div className="space-y-3 mt-2">
-                        {comments.map((comment) => (
-                            <div key={comment._id} className="flex gap-2">
-                                <img
-                                    src={comment.author?.profilePicture || "src/assets/avatar-colorful-48.png"}
-                                    className="w-8 h-8 rounded-full"
-                                    alt="user"
-                                />
-                                <div className="flex-1">
-                                    <div className="bg-gray-100 p-2 rounded-lg">
-                                        <p className="font-bold text-[12px]">{comment.author?.name} {comment.author?.lastName}</p>
-                                        <p className="text-sm text-gray-700">{comment.content}</p>
-                                    </div>
-                                    <span className="text-[10px] text-gray-400 ml-2">
-                                        {new Date(comment.createdAt).toLocaleDateString()}
-                                    </span>
-                                </div>
+            {/* Render Comments if loaded */}
+            {comments.length > 0 && (
+                <div className="px-4 mt-4 space-y-3">
+                    {comments.map((comment) => (
+                        <div key={comment._id} className="flex gap-2">
+                            <img src={comment.author?.profilePicture || "src/assets/avatar-colorful-48.png"} className="w-8 h-8 rounded-full" alt="user" />
+                            <div className="flex-1 bg-gray-100 p-2 rounded-lg">
+                                <p className="font-bold text-[12px]">{comment.author?.name} {comment.author?.lastName}</p>
+                                <p className="text-sm">{comment.content}</p>
                             </div>
-                        ))}
-                        <Button
-                            type="text"
-                            size="small"
-                            className="text-[10px] text-gray-400"
-                            onClick={() => setComments([])}
-                        >
-                            Hide comments
-                        </Button>
-                    </div>
-                )}
-            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            <EditPostModal
+                isModalOpen={isEditModalOpen}
+                setIsModalOpen={setIsEditModalOpen}
+                post={post}
+                user={user}
+                onUpdateSuccess={handleUpdateSuccess}
+            />
         </div>
     );
 };

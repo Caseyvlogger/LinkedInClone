@@ -45,7 +45,7 @@ function MyActivity() {
                 {loading ? (
                     <div className="flex justify-center p-10"><Spin size="large" /></div>
                 ) : posts.length > 0 ? (
-                    posts.map(post => <ActivityPostItem key={post._id} post={post} onDeleteSuccess={handleDeletePostState} />)
+                    posts.map(post => <ActivityPostItem key={post._id} post={post} onDeleteSuccess={handleDeletePostState} user={user} />)
                 ) : (
                     <div className="bg-white p-10 rounded-lg border border-gray-200">
                         <Empty description="You haven't posted anything yet." />

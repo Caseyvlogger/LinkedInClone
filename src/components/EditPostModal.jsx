@@ -87,7 +87,8 @@ const EditPostModal = ({ isModalOpen, setIsModalOpen, post, onUpdateSuccess, use
             newRawFiles.forEach(file => formData.append("files", file));
 
             const response = await axiosInstance.patch(`/posts/${post._id}`, formData, {
-                headers: { 'Content-Type': 'multipart/form-data' }
+                headers: { 'Content-Type': 'multipart/form-data' },
+                timeout: 60000
             });
 
             message.success("Post updated!");

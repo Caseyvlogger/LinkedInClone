@@ -109,7 +109,10 @@ const EditPostModal = ({ isModalOpen, setIsModalOpen, post, onUpdateSuccess, use
             maskClosable={!loading}
             onCancel={() => setIsModalOpen(false)}
             footer={[
-                <Button key="cam" icon={<img src={cameraIcon} className="w-6" />} onClick={() => fileInputRef.current.click()} />,
+                <Button key="cam"
+                    disabled={filesLoading || loading}
+                    loading={loading}
+                    icon={<img src={cameraIcon} className="w-6" />} onClick={() => fileInputRef.current.click()} />,
                 <Button key="submit" type="primary" loading={loading} onClick={handleUpdate} disabled={filesLoading || loading}>
                     Save Changes
                 </Button>

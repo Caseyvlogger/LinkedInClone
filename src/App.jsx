@@ -47,6 +47,11 @@ function App() {
           <MyActivity />
         </PrivateRoute>
       } />
+      <Route path='/profile' element={
+        <PrivateRoute>
+          <Profile />
+        </PrivateRoute>
+      } />
 
       <Route path="/*" element={<p>Not found</p>} />
     </Routes>

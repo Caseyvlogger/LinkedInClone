@@ -1,4 +1,4 @@
-import { Form, Input, Button, Checkbox, message } from "antd";
+import { Form, Input, Button, message } from "antd";
 import { useNavigate } from 'react-router-dom';
 import { loginUser } from '../services/authService.js';
 
@@ -49,27 +49,6 @@ function SignIn() {
                     onFinishFailed={onFinishFailed}
                     autoComplete="on"
                 >
-                    <div className="flex flex-col gap-3 mb-6">
-                        <Button
-                            type="text"
-                            className="!flex !items-center !justify-center !w-full !border !border-gray-300 !rounded-[50px] !py-5 hover:bg-gray-100"
-                        >
-                            <img src="/src/assets/google-white-48.png" alt="Google" className="w-5 h-5 mr-2" />
-                            Continue with Google
-                        </Button>
-                        <Button
-                            type="text"
-                            className="!flex !items-center !justify-center !w-full !border !border-gray-300 !rounded-[50px] !py-5 hover:bg-gray-100"
-                        >
-                            <img src="/src/assets/microsoft-white-48.png" alt="Microsoft" className="w-5 h-5 mr-2" />
-                            Continue with Microsoft
-                        </Button>
-                    </div>
-                    <div className="flex items-center mb-6">
-                        <div className="flex-grow border-t border-gray-300"></div>
-                        <span className="mx-3 text-sm text-gray-500 font-medium">or</span>
-                        <div className="flex-grow border-t border-gray-300"></div>
-                    </div>
                     <Form.Item
                         name="email"
                         rules={[
@@ -92,14 +71,6 @@ function SignIn() {
                                 </span>
                             )}
                         />
-                    </Form.Item>
-                    <div className="mb-2">
-                        <a href="#" className="text-[#0A66C2] hover:underline font-semibold">
-                            Forgot password?
-                        </a>
-                    </div>
-                    <Form.Item name="remember" valuePropName="checked" noStyle>
-                        <Checkbox className="mb-4">Keep me logged in</Checkbox>
                     </Form.Item>
                     <Form.Item className="mt-4">
                         <Button

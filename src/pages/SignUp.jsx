@@ -1,4 +1,4 @@
-import { Form, Input, Button, Checkbox, message } from "antd";
+import { Form, Input, Button, message } from "antd";
 import { useNavigate } from 'react-router-dom';
 import { registerUser } from "../services/authService.js";
 
@@ -43,10 +43,10 @@ function SignUp() {
     };
 
     return (
-        <div class="flex border flex-col items-center bg-[#f3f2f0]">
+        <div class="flex flex-col items-center bg-[#f3f2f0]">
             {/* div for LinkedIn Icon */}
             {/* Title */}
-            <div className="mb-[30px] mt-[30px] mx-6 border">
+            <div className="mb-[30px] mt-[30px] mx-6">
                 <p className="text-3xl">Make the most of your professional life</p>
             </div>
 
@@ -126,9 +126,6 @@ function SignUp() {
                             )}
                         />
                     </Form.Item>
-                    <Checkbox className="!mt-[10px] !mb-[10px]">
-                        Remember me
-                    </Checkbox>
                     <Form.Item>
                         <p className="text-xs text-gray-500 leading-relaxed">
                             By clicking <strong>Agree &amp; Join</strong> or <strong>Continue</strong>,
@@ -145,46 +142,6 @@ function SignUp() {
                                 Cookie Policy
                             </a>.
                         </p>
-                    </Form.Item>
-                    <Form.Item>
-                        <div className="flex items-center !mb-[30px]">
-                            <div className="flex-grow border-t border-gray-300"></div>
-
-                            <span className="mx-3 text-sm text-gray-500 font-medium whitespace-nowrap">
-                                or
-                            </span>
-
-                            <div className="flex-grow border-t border-gray-300"></div>
-                        </div>
-                        <div className="flex flex-col gap-3 mt-4">
-                            {/* Google */}
-                            <Button
-                                type="text"
-                                className="!flex !items-center !justify-center !w-full !border !border-gray-300 !rounded-[50px] !py-5 hover:bg-gray-100"
-                                onClick={() => console.log("Google login clicked")}
-                            >
-                                <img
-                                    src="src\assets\google-white-48.png"
-                                    alt="Google"
-                                    className="w-5 h-5 mr-2"
-                                />
-                                Continue with Google
-                            </Button>
-
-                            {/* Microsoft */}
-                            <Button
-                                type="text"
-                                className="!flex !items-center !justify-center !w-full !border !border-gray-300 !rounded-[50px] !py-5 hover:bg-gray-100"
-                                onClick={() => console.log("Microsoft login clicked")}
-                            >
-                                <img
-                                    src="src\assets\microsoft-white-48.png"
-                                    alt="Microsoft"
-                                    className="w-5 h-5 mr-2"
-                                />
-                                Continue with Microsoft
-                            </Button>
-                        </div>
                     </Form.Item>
 
                     {/* Submit */}

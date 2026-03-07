@@ -70,6 +70,12 @@ const Network = () => {
             if (response.status === 201) {
                 message.success("Connection request sent!");
                 setSentRequestIds((prev) => [...prev, recipientId]);
+                setConnections(prev => [...prev, {
+                    _id: response.data._id,
+                    requester: user.id || user._id,
+                    recipient: recipientId,
+                    status: 'pending'
+                }]);
             }
         } catch (error) {
             message.error(error.response?.data?.message || "Failed to send request.");
@@ -137,7 +143,7 @@ const Network = () => {
         if (conn?.status === 'accepted') return 'connected';
 
         if (conn?.status === 'pending') {
-            const iAmRequester = String(conn.requester?._id || conn.requester) === myId;
+            const iAmRequester = conn.isRecipient === false || String(conn.requester?._id || conn.requester) === myId;
             if (iAmRequester || sentRequestIds.includes(tid)) {
                 return 'pending';
             }

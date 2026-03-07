@@ -60,6 +60,8 @@ const Network = () => {
         c.status === 'pending' && c.isRecipient === true
     );
 
+    const invitationSenderIds = invitations.map(inv => String(inv.requester._id || inv.requester));
+
     const handleConnect = async (recipientId) => {
         try {
             setConnectingId(recipientId);
@@ -126,13 +128,21 @@ const Network = () => {
 
     const getConnectionStatus = (targetId) => {
         const tid = String(targetId);
+        const myId = String(user.id || user._id);
         const conn = connections.find(c =>
             (String(c.requester?._id || c.requester) === tid) ||
             (String(c.recipient?._id || c.recipient) === tid)
         );
 
         if (conn?.status === 'accepted') return 'connected';
-        if (conn?.status === 'pending' || sentRequestIds.includes(tid)) return 'pending';
+
+        if (conn?.status === 'pending') {
+            const iAmRequester = String(conn.requester?._id || conn.requester) === myId;
+            if (iAmRequester || sentRequestIds.includes(tid)) {
+                return 'pending';
+            }
+            return 'none';
+        }
         return 'none';
     };
 
@@ -226,67 +236,69 @@ const Network = () => {
                         {/* Suggestions Section */}
                         <h2 className="!text-xl !font-bold !text-gray-800 !mb-6">People you may know</h2>
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                            {users.map((u) => {
-                                const userId = u.id || u._id;
-                                const status = getConnectionStatus(userId);
+                            {users
+                                .filter(u => !invitationSenderIds.includes(String(u.id || u._id)))
+                                .map((u) => {
+                                    const userId = u.id || u._id;
+                                    const status = getConnectionStatus(userId);
 
-                                return (
-                                    <Card key={userId} className="!hover:shadow-md !transition-shadow">
-                                        <div className="flex flex-col items-center">
-                                            <img
-                                                src={u.profilePicture || `https://placehold.co/80x80?text=${u.name ? u.name[0] : 'U'}`}
-                                                alt="profile"
-                                                className="w-20 h-20 rounded-full mb-4 border"
-                                            />
-                                            <h3 className="!font-bold !text-gray-800">{u.name} {u.lastName}</h3>
-                                            <p className="!text-gray-500 !text-sm !mb-6">Professional at Shifa</p>
+                                    return (
+                                        <Card key={userId} className="!hover:shadow-md !transition-shadow">
+                                            <div className="flex flex-col items-center">
+                                                <img
+                                                    src={u.profilePicture || `https://placehold.co/80x80?text=${u.name ? u.name[0] : 'U'}`}
+                                                    alt="profile"
+                                                    className="w-20 h-20 rounded-full mb-4 border"
+                                                />
+                                                <h3 className="!font-bold !text-gray-800">{u.name} {u.lastName}</h3>
+                                                <p className="!text-gray-500 !text-sm !mb-6">Professional at Shifa</p>
 
-                                            {status === 'connected' ? (
-                                                <Button
-                                                    block
-                                                    icon={<UserOutlined />}
-                                                    className="!rounded-full !bg-emerald-50 !border-emerald-200 !text-emerald-600 !font-semibold !cursor-default !hover:bg-emerald-50 !hover:text-emerald-600 !hover:border-emerald-200"
-                                                >
-                                                    Connected
-                                                </Button>
-                                            ) : status === 'pending' ? (
-                                                <div className="flex flex-row gap-2">
+                                                {status === 'connected' ? (
                                                     <Button
-                                                        disabled
-                                                        icon={<CheckCircleOutlined />}
-                                                        className="!rounded-full !bg-gray-100 !text-gray-400"
+                                                        block
+                                                        icon={<UserOutlined />}
+                                                        className="!rounded-full !bg-emerald-50 !border-emerald-200 !text-emerald-600 !font-semibold !cursor-default !hover:bg-emerald-50 !hover:text-emerald-600 !hover:border-emerald-200"
                                                     >
-                                                        Pending
+                                                        Connected
                                                     </Button>
+                                                ) : status === 'pending' ? (
+                                                    <div className="flex flex-row gap-2">
+                                                        <Button
+                                                            disabled
+                                                            icon={<CheckCircleOutlined />}
+                                                            className="!rounded-full !bg-gray-100 !text-gray-400"
+                                                        >
+                                                            Pending
+                                                        </Button>
 
+                                                        <Button
+                                                            danger
+                                                            // Button turns into a spinner and becomes unclickable while request is in flight
+                                                            loading={cancelLoadingId === userId}
+                                                            disabled={cancelLoadingId === userId}
+                                                            icon={cancelLoadingId !== userId && <CloseOutlined />}
+                                                            className="!rounded-full !flex !items-center hover:!bg-red-50"
+                                                            onClick={() => handleCancelConnection(userId)}
+                                                        >
+                                                            Cancel
+                                                        </Button>
+                                                    </div>
+                                                ) : (
                                                     <Button
-                                                        danger
-                                                        // Button turns into a spinner and becomes unclickable while request is in flight
-                                                        loading={cancelLoadingId === userId}
-                                                        disabled={cancelLoadingId === userId}
-                                                        icon={cancelLoadingId !== userId && <CloseOutlined />}
-                                                        className="!rounded-full !flex !items-center hover:!bg-red-50"
-                                                        onClick={() => handleCancelConnection(userId)}
+                                                        type="default"
+                                                        block
+                                                        className="!rounded-full !border-blue-600 !text-blue-600 !font-bold !hover:bg-blue-50 !flex !items-center !justify-center"
+                                                        onClick={() => handleConnect(userId)}
+                                                        loading={connectingId === userId}
+                                                        icon={connectingId !== userId && <UserAddOutlined />}
                                                     >
-                                                        Cancel
+                                                        Connect
                                                     </Button>
-                                                </div>
-                                            ) : (
-                                                <Button
-                                                    type="default"
-                                                    block
-                                                    className="!rounded-full !border-blue-600 !text-blue-600 !font-bold !hover:bg-blue-50 !flex !items-center !justify-center"
-                                                    onClick={() => handleConnect(userId)}
-                                                    loading={connectingId === userId}
-                                                    icon={connectingId !== userId && <UserAddOutlined />}
-                                                >
-                                                    Connect
-                                                </Button>
-                                            )}
-                                        </div>
-                                    </Card>
-                                );
-                            })}
+                                                )}
+                                            </div>
+                                        </Card>
+                                    );
+                                })}
                         </div>
                         {/* Connections */}
                         {connectedConnections.length > 0 && (

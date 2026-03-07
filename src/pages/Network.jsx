@@ -76,6 +76,21 @@ const Network = () => {
         }
     };
 
+    const handleRemoveConnection = async (connectionId) => {
+        try {
+            setActionLoading(connectionId);
+            await axiosInstance.delete(`/connections/remove/${connectionId}`);
+
+            setConnectedConnections(prev => prev.filter(conn => conn._id !== connectionId));
+            message.success("Connection removed");
+        } catch (error) {
+            message.error("Failed to remove connection");
+            console.error(error);
+        } finally {
+            setActionLoading(null);
+        }
+    };
+
     const handleAccept = async (connectionId) => {
         try {
             setActionLoading(connectionId);
@@ -298,13 +313,26 @@ const Network = () => {
                                                         {connectionData.name} {connectionData.lastName}
                                                     </div>
                                                     <div className="text-gray-500 text-sm mb-4">Connection</div>
-                                                    <Button
-                                                        type="primary"
-                                                        ghost
-                                                        className="!rounded-full w-full !border-blue-600 !text-blue-600"
-                                                    >
-                                                        Message
-                                                    </Button>
+                                                    <div className="flex flex-row w-full gap-2 mt-2 items-center">
+                                                        <Button
+                                                            type="primary"
+                                                            ghost
+                                                            className="!rounded-full w-full !border-blue-600 !text-blue-600"
+                                                        >
+                                                            Message
+                                                        </Button>
+                                                        <Button
+                                                            danger
+                                                            type="primary"
+                                                            size="small"
+                                                            ghost
+                                                            loading={actionLoading === conn._id}
+                                                            onClick={() => handleRemoveConnection(conn._id)}
+                                                            className='!rounded-full'
+                                                        >
+                                                            Remove Connection
+                                                        </Button>
+                                                    </div>
                                                 </div>
                                             </Card>
                                         );

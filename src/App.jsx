@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom"
+import { Routes, Route, Navigate } from "react-router-dom"
 
 import Home from "./pages/Home.jsx"
 import Profile from "./pages/Profile.jsx"
@@ -14,6 +14,7 @@ function App() {
 
   return (
     <Routes>
+      <Route path="/" element={<Navigate to="/feed" replace />} />
       <Route path="/home" element={<Home />} />
 
       {/* For logged out users only. */}

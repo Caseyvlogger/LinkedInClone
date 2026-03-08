@@ -1,6 +1,14 @@
 import { Input, Dropdown } from "antd";
-import { useNavigate, Link } from 'react-router-dom'; // Added Link
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import axiosInstance from '../api/axiosInstance.js';
+import {
+    HomeFilled,
+    HomeOutlined,
+    UserOutlined,
+    SolutionOutlined,
+    LogoutOutlined,
+    DownOutlined,
+} from '@ant-design/icons';
 
 function Navbar(props) {
     const navigate = useNavigate();
@@ -30,15 +38,18 @@ function Navbar(props) {
         { type: 'divider' },
         {
             key: '2',
+            icon: <UserOutlined />,
             label: <Link to="/profile">View Profile</Link>,
         },
         {
             key: 'activity',
+            icon: <SolutionOutlined />,
             label: <Link to="/my-activity">My Activity</Link>,
         },
         { type: 'divider' },
         {
             key: '4',
+            icon: <LogoutOutlined className="text-red-600" />,
             label: (
                 <span onClick={handleLogout} className="text-red-600 font-medium">
                     Sign Out
@@ -55,8 +66,8 @@ function Navbar(props) {
                 </div>
 
                 <div className="flex flex-row items-center">
-                    <NavItem icon="src/assets/home-filled-24.png" label="Home" onClick={() => navigate('/feed')} />
-                    <NavItem icon="src/assets/people-24.png" label="My Network" onClick={() => navigate('/network')} />
+                    <NavItem path='/feed' filledIcon={<HomeFilled />} outlinedIcon={<HomeOutlined />} label="Home" onClick={() => navigate('/feed')} />
+                    <NavItem path='/network' filledIcon={<img src='src/assets/people-filled.png' />} outlinedIcon={<img src='src/assets/people-outlined.png' />} label="My Network" onClick={() => navigate('/network')} />
 
                     <Dropdown menu={{ items }} trigger={['click']} placement="bottomRight" arrow>
                         <div className="flex flex-col items-center cursor-pointer w-[75px] max-[747px]:w-[50px]">
@@ -73,11 +84,17 @@ function Navbar(props) {
     );
 }
 
-const NavItem = ({ icon, label, onClick }) => (
-    <div className="flex flex-col items-center cursor-pointer w-[75px] max-[747px]:w-[43px]" onClick={onClick}>
-        <img src={icon} alt={label} />
-        <p className="text-xs max-[853px]:hidden">{label}</p>
-    </div>
-);
+const NavItem = ({ path, filledIcon, outlinedIcon, label, onClick }) => {
+    const location = useLocation();
+    const isActive = location.pathname === path;
+    return (
+        <div className="flex flex-col items-center cursor-pointer w-[75px] max-[747px]:w-[43px]" onClick={onClick}>
+            <div style={{ fontSize: '20px' }}>
+                {isActive ? filledIcon : outlinedIcon}
+            </div>
+            <p className="text-xs max-[853px]:hidden">{label}</p>
+        </div>
+    );
+}
 
 export default Navbar;

@@ -29,9 +29,11 @@ axiosInstance.interceptors.response.use(
             if (status === 401 && window.location.pathname !== '/signin') {
                 localStorage.clear();
                 window.location.href = '/signin';
+                return Promise.reject(error)
             }
-
-            message.error(data?.message || "An error occurred");
+            if (status !== 404) {
+                message.error(data?.message || "An error occurred");
+            }
         }
 
         else if (error.request) {

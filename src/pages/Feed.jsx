@@ -143,10 +143,10 @@ function Feed() {
         <div className="bg-[#f4f2ee] min-h-screen">
             <Navbar user={user} />
 
-            <div className="flex flex-col md:flex-row justify-center gap-6 px-4 mt-6 max-w-6xl mx-auto">
+            <div className="flex flex-col md:flex-row justify-center gap-6 px-4 mt-6 max-w-6xl mx-auto items-start">
 
                 {/* Profile Sidebar */}
-                <div className="w-full md:w-[225px] flex-shrink-0 bg-white h-fit rounded-lg overflow-hidden border border-gray-200">
+                <div className="w-full max-w-[555px] md:w-[225px]  flex-shrink-0 bg-white h-fit rounded-lg overflow-hidden border border-gray-200">
                     <div className="w-full h-[58px] bg-gray-300"></div>
                     <div
                         className="relative flex justify-center -mt-8 cursor-pointer"
@@ -189,7 +189,7 @@ function Feed() {
                     <div className="w-full max-w-[555px] flex flex-col gap-4">
 
                         {/* Start a post box */}
-                        <div className="bg-white rounded-lg border border-gray-200 p-4">
+                        <div className="bg-white rounded-lg border border-gray-200 p-4 w-full max-w-[555px]">
                             <div className="flex gap-2">
                                 <img src={user?.profilePicture || "src/assets/avatar-colorful-48.png"} className="w-12 h-12 rounded-full" alt="Avatar" />
                                 <Button
@@ -223,7 +223,7 @@ function Feed() {
                     </div>
 
                     {/* Right Suggestions Sidebar */}
-                    <div className="w-full lg:w-[300px] bg-white rounded-lg border border-gray-200 p-4 h-fit">
+                    <div className="w-full max-w-[555px] lg:w-[300px] bg-white rounded-lg border border-gray-200 p-4 h-fit">
                         <p className="font-semibold mb-4">Add to your Feed</p>
 
                         {[1, 2, 3].map((item) => (

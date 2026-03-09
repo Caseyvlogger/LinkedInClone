@@ -26,8 +26,8 @@ const PostModal = ({ setIsModalOpen, isModalOpen, user }) => {
         selectedImages.length > 0 && (
             <div className="relative mt-4">
                 {selectedImages.map((imgSrc, index) => (
-                    <div key={index} className="relative group">
-                        <img src={imgSrc} alt={`Preview ${index}`} className="w-full h-32 object-cover rounded-lg" />
+                    <div key={index} className="relative group mb-2 flex justify-center bg-gray-50 rounded-lg overflow-hidden">
+                        <img src={imgSrc} alt={`Preview ${index}`} className="max-w-full max-h-80 object-contain" />
                         <Button
                             type="primary"
                             danger

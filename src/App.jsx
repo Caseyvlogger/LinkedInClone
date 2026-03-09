@@ -15,7 +15,6 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/feed" replace />} />
-      <Route path="/home" element={<Home />} />
 
       {/* For logged out users only. */}
       {/* Outlet in PublicRoute shows either SignIn or Up. */}

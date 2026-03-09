@@ -28,7 +28,7 @@ const Profile = () => {
             const res = await axiosInstance.get("/auth/me");
             setUser(res.data);
         } catch (err) {
-            message.error("Failed to load profile");
+            message.error({ content: "Failed to load profile", key: 'profile_load_failed_key' });
         } finally { setLoading(false); }
     };
 

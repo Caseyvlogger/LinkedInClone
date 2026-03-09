@@ -58,7 +58,7 @@ function Feed() {
     const handleLike = async (postId, currentLikes) => {
         //Check if internet is off.
         if (!window.navigator.onLine) {
-            return message.error("You are offline.")
+            return message.error({ content: "You are offline.", key: "you_are_offline_key" })
         }
         //For reverting to old posts if server is down, create a copy.
         const originalPosts = [...posts];
@@ -111,7 +111,7 @@ function Feed() {
                 setUser(response.data);
                 setMeLoading(false)
             } catch (error) {
-                message.error("Failed to load user profile");
+                message.error({ content: "Failed to load user profile", key: "profile_load_failed_key" });
             }
         };
         fetchUserData();
@@ -127,7 +127,7 @@ function Feed() {
             }
             catch (error) {
                 console.error("Error:", error)
-                message.error("Failed to load feed data.")
+                message.error({ content: "Failed to load feed data.", key: "feed_load_failed_key" })
             }
         }
         fetchPosts();

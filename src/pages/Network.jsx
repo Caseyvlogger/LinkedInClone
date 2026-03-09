@@ -46,7 +46,7 @@ const Network = () => {
 
             setConnections(processedConnections);
         } catch (error) {
-            message.error("Could not load network data. Check your connection.");
+            message.error({ content: "Could not load network data. Check your connection.", key: 'check_connection_key' });
         } finally {
             setLoading(false);
         }

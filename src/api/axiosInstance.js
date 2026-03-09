@@ -36,10 +36,16 @@ axiosInstance.interceptors.response.use(
 
         else if (error.request) {
             console.error("No response received from server.");
-            message.error("Network Error: Server unreachable.");
+            message.error({
+                content: "Network Error: Server unreachable.",
+                key: 'network_error_key'
+            });
         }
         else {
-            message.error("Request Error: " + error.message);
+            message.error({
+                content: "Request Error: " + error.message,
+                key: 'request_error_key'
+            });
         }
         return Promise.reject(error);
     }

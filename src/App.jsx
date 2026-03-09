@@ -1,6 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom"
 
-import Home from "./pages/Home.jsx"
 import Profile from "./pages/Profile.jsx"
 import Feed from "./pages/Feed.jsx"
 import SignUp from "./pages/SignUp.jsx"
@@ -9,6 +8,13 @@ import PrivateRoute from "./components/PrivateRoute.jsx"
 import PublicRoute from "./components/PublicRoute.jsx"
 import Network from "./pages/Network.jsx"
 import MyActivity from "./pages/MyActivity.jsx"
+
+import { message } from 'antd';
+
+message.config({
+  duration: 3,
+  rtl: false,
+});
 
 function App() {
 

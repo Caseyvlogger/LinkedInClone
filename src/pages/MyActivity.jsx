@@ -26,7 +26,7 @@ function MyActivity() {
                 setUser(userResponse.data);
                 setPosts(postsResponse.data);
             } catch (error) {
-                message.error("Failed to load your activity or profile.");
+                message.error({ content: "Failed to load your activity or profile.", key: "activity/profile_load_failed_key" });
                 console.error(error);
             } finally {
                 setLoading(false);

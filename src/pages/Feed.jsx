@@ -175,9 +175,6 @@ function Feed() {
                         </p>
                         <p className="text-gray-500 text-xs">Software Engineer</p>
                     </div>
-                    <div className="border-t border-gray-200 p-3">
-                        <Button type="dashed" className="!bg-[#f4f2ee] w-full">Experience</Button>
-                    </div>
                 </div>
 
                 {/* Main Feed Content */}
@@ -188,7 +185,7 @@ function Feed() {
 
                         {/* Start a post box */}
                         <div className="bg-white rounded-lg border border-gray-200 p-4 w-full max-w-[555px]">
-                            <div className="flex gap-2">
+                            <div className="flex gap-2 items-center">
                                 <img src={user?.profilePicture || "src/assets/avatar-colorful-48.png"} className="w-12 h-12 rounded-full" alt="Avatar" />
                                 <Button
                                     onClick={showModal}
@@ -196,11 +193,6 @@ function Feed() {
                                 >
                                     Start a post
                                 </Button>
-                            </div>
-                            <div className="flex justify-between mt-3 px-2">
-                                <Button type="text" className="font-semibold text-gray-500">Video</Button>
-                                <Button type="text" className="font-semibold text-gray-500">Photo</Button>
-                                <Button type="text" className="font-semibold text-gray-500">Write article</Button>
                             </div>
                         </div>
 

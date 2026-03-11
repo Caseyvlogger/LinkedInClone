@@ -10,18 +10,24 @@ import {
     DownOutlined,
 } from '@ant-design/icons';
 
+import { useDispatch } from "react-redux";
+import { logout } from '../redux/slices/authSlice.js'
+
 function Navbar(props) {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const handleLogout = async () => {
         try {
             const refreshToken = localStorage.getItem('refreshToken');
-            await axiosInstance.post('/auth/logout', { refreshToken });
+            if (refreshToken) {
+                await axiosInstance.post('/auth/logout', { refreshToken });
+            }
         } catch (error) {
             console.warn("Server-side logout failed, clearing locally.");
         } finally {
-            localStorage.clear();
-            navigate('/home');
+            dispatch(logout());
+            navigate('/signin')
         }
     };
 

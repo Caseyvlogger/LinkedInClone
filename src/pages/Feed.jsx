@@ -4,12 +4,19 @@ import { useState, useEffect, useRef } from "react";
 import axiosInstance from "../api/axiosInstance";
 import PostModal from "../components/PostModal";
 import PostItem from "../components/PostItem";
+import { useSelector, useDispatch } from "react-redux";
+import { setAuth } from "../redux/slices/authSlice";
 
 function Feed() {
-    const [user, setUser] = useState(null);
+
+    const dispatch = useDispatch();
+
+    const { user, loading: authLoading } = useSelector((state) => state.auth)
+
     const [posts, setPosts] = useState([])
 
-    const [meLoading, setMeLoading] = useState(false);
+    const [uploading, setUploading] = useState(false);
+
     const [postsLoading, setPostsLoading] = useState(false);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -33,7 +40,7 @@ function Feed() {
         formData.append("image", file);
 
         try {
-            setMeLoading(true);
+            setUploading(true);
 
             //Axios will automatically set contenttype to multipart formdata
             const response = await axiosInstance.patch('/auth/me/avatar', formData, {
@@ -43,13 +50,11 @@ function Feed() {
             });
 
             const updatedUser = response.data.user || response.data;
-            setUser(updatedUser);
-
+            dispatch(setAuth(updatedUser))
+            setUploading(false)
             message.success("Profile picture updated!");
         } catch (error) {
             message.error("Failed to upload profile picture.");
-        } finally {
-            setMeLoading(false);
         }
     };
 
@@ -103,19 +108,6 @@ function Feed() {
         { label: 'Most recent', key: '2' },
     ];
 
-    useEffect(() => {
-        const fetchUserData = async () => {
-            try {
-                setMeLoading(true)
-                const response = await axiosInstance.get('auth/me');
-                setUser(response.data);
-                setMeLoading(false)
-            } catch (error) {
-                message.error({ content: "Failed to load user profile", key: "profile_load_failed_key" });
-            }
-        };
-        fetchUserData();
-    }, []);
 
     useEffect(() => {
         const fetchPosts = async () => {
@@ -133,9 +125,15 @@ function Feed() {
         fetchPosts();
     }, [])
 
-    if (meLoading) return (
+    if (uploading) return (
         <div className="flex h-screen justify-center items-center">
-            <Spin />
+            <Spin size="large" tip="Uploading..." />
+        </div>
+    )
+
+    if (authLoading) return (
+        <div className="flex h-screen justify-center items-center">
+            <Spin size="large" tip="Authenticating..." />
         </div>
     )
 

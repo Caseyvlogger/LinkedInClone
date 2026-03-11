@@ -10,6 +10,9 @@ import Network from "./pages/Network.jsx"
 import MyActivity from "./pages/MyActivity.jsx"
 
 import { message } from 'antd';
+import { useDispatch } from "react-redux"
+import { fetchCurrentUser } from './redux/slices/authSlice.js'
+import { useEffect } from "react"
 
 message.config({
   duration: 3,
@@ -17,6 +20,13 @@ message.config({
 });
 
 function App() {
+
+  const dispatch = useDispatch();
+  useEffect(() => {
+    if (localStorage.getItem('accessToken')) {
+      dispatch(fetchCurrentUser())
+    }
+  }, [dispatch])
 
   return (
     <Routes>

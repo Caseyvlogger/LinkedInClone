@@ -1,10 +1,13 @@
 import { Form, Input, Button, message } from "antd";
 import { useNavigate } from 'react-router-dom';
 import { loginUser } from '../services/authService.js';
+import { useDispatch } from "react-redux";
+import { setAuth } from '../redux/slices/authSlice.js'
 
 function SignIn() {
     const [form] = Form.useForm();
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const onFinish = async (values) => {
         const hideLoading = message.loading('Signing in...', 0);
@@ -16,6 +19,7 @@ function SignIn() {
             if (accessToken) {
                 localStorage.setItem('accessToken', accessToken);
                 localStorage.setItem('refreshToken', refreshToken);
+                dispatch(setAuth(data.user))
                 hideLoading();
                 message.success("Signed in successfully!");
                 navigate('/feed');
@@ -36,7 +40,7 @@ function SignIn() {
     };
 
     return (
-        <div className="flex border flex-col items-center bg-[#f3f2f0] min-h-screen">
+        <div className="flex flex-col items-center bg-[#f3f2f0] min-h-screen">
             <div className="mb-[30px] mt-[30px] mx-6"></div>
             <div className="bg-white p-5 rounded-[8px] w-[400px] shadow-sm">
                 <div>

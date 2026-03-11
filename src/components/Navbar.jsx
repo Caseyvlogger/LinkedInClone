@@ -7,7 +7,7 @@ import {
     UserOutlined,
     SolutionOutlined,
     LogoutOutlined,
-    DownOutlined,
+    CaretDownFilled,
 } from '@ant-design/icons';
 
 import { useDispatch } from "react-redux";
@@ -17,17 +17,20 @@ function Navbar(props) {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    const handleLogout = async () => {
-        try {
-            const refreshToken = localStorage.getItem('refreshToken');
-            if (refreshToken) {
-                await axiosInstance.post('/auth/logout', { refreshToken });
-            }
-        } catch (error) {
-            console.warn("Server-side logout failed, clearing locally.");
-        } finally {
-            dispatch(logout());
-            navigate('/signin')
+    const handleLogout = () => {
+        const refreshToken = localStorage.getItem('refreshToken');
+
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        localStorage.clear();
+
+        dispatch(logout());
+
+        navigate('/signin', { replace: true });
+
+        if (refreshToken) {
+            axiosInstance.post('/auth/logout', { refreshToken })
+                .catch(err => console.warn("Logout sync failed", err));
         }
     };
 
@@ -57,10 +60,11 @@ function Navbar(props) {
             key: '4',
             icon: <LogoutOutlined className="text-red-600" />,
             label: (
-                <span onClick={handleLogout} className="text-red-600 font-medium">
+                <span className="text-red-600 font-medium">
                     Sign Out
                 </span>
             ),
+            onClick: handleLogout
         },
     ];
 
@@ -79,8 +83,7 @@ function Navbar(props) {
                         <div className="flex flex-col items-center cursor-pointer w-[75px] max-[747px]:w-[50px]">
                             <img src={props.user?.profilePicture || "src/assets/avatar-colorful-24.png"} alt="Me" className="rounded-full w-6 h-6 border border-gray-200" />
                             <div className="flex flex-row items-center">
-                                <p className="text-xs max-[853px]:hidden">Me</p>
-                                <img src="src/assets/arrow-down-10.png" alt="v" className="ml-1" />
+                                <CaretDownFilled />
                             </div>
                         </div>
                     </Dropdown>

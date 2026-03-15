@@ -331,14 +331,7 @@ const Network = () => {
                                                         {connectionData.name} {connectionData.lastName}
                                                     </div>
                                                     <div className="text-gray-500 text-sm mb-4">Connection</div>
-                                                    <div className="flex flex-row w-full gap-2 mt-2 items-center">
-                                                        <Button
-                                                            type="primary"
-                                                            ghost
-                                                            className="!rounded-full w-full !border-blue-600 !text-blue-600"
-                                                        >
-                                                            Message
-                                                        </Button>
+                                                    <div className="flex flex-row w-full gap-2 mt-2 justify-center">
                                                         <Button
                                                             danger
                                                             type="primary"

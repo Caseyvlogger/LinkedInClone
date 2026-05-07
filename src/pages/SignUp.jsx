@@ -1,12 +1,15 @@
 import { Form, Input, Button, message } from "antd";
 import { useNavigate } from 'react-router-dom';
 import { registerUser } from "../services/authService.js";
+import { useDispatch } from "react-redux";
+import { fetchCurrentUser } from "../redux/slices/authSlice.js";
 
 function SignUp() {
 
     const [form] = Form.useForm();
 
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const onFinish = async (values) => {
         const hideLoading = message.loading('Creating your account...', 0);
@@ -24,6 +27,9 @@ function SignUp() {
                 hideLoading();
                 message.success("Account created successfully!");
 
+                // Update Redux auth state immediately so route guards don't bounce:
+                // /feed -> /signin -> /feed (throttled navigation loop).
+                dispatch(fetchCurrentUser());
                 navigate('/feed');
             } else {
                 throw new Error("Registration failed: No token received.");
@@ -43,7 +49,7 @@ function SignUp() {
     };
 
     return (
-        <div class="flex flex-col items-center bg-[#f3f2f0]">
+        <div className="flex flex-col items-center bg-[#f3f2f0]">
             {/* div for LinkedIn Icon */}
             {/* Title */}
             <div className="mb-[30px] mt-[30px] mx-6">
